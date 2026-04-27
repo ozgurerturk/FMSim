@@ -42,6 +42,8 @@ namespace FMSimTools.ViewModels
 
         public event EventHandler<SimulationResult>? SimulationCompleted;
 
+        public event EventHandler<string>? SimulationFailed;
+
         public event EventHandler? CloseRequested;
 
         [RelayCommand(CanExecute = nameof(CanStartSimulation))]
@@ -70,6 +72,7 @@ namespace FMSimTools.ViewModels
             catch (Exception exception)
             {
                 StatusMessage = $"Simulation failed: {exception.Message}";
+                SimulationFailed?.Invoke(this, StatusMessage);
             }
             finally
             {

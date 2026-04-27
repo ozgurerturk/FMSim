@@ -7,6 +7,46 @@ namespace FMSimTools.Services
 {
     public static class TeamJsonStore
     {
+        private static readonly string[] RequiredPlayerAttributes =
+        [
+            "defense",
+            "attack",
+            "pace",
+            "stamina",
+            "passing",
+            "tackle",
+            "dribbling",
+            "shooting",
+            "physicality",
+            "jumping",
+            "reactionTime"
+        ];
+
+        private static readonly string[] ValidAttackTactics =
+        [
+            "Possession",
+            "WingPlay",
+            "LongBall",
+            "TikiTaka",
+            "CounterAttack"
+        ];
+
+        private static readonly string[] ValidDefenseTactics =
+        [
+            "Pressing",
+            "ManMarking",
+            "ZonalMarking",
+            "CounterPressing"
+        ];
+
+        private static readonly string[] ValidPositions =
+        [
+            "Goalkeeper",
+            "Defender",
+            "Midfielder",
+            "Attacker"
+        ];
+
         private static readonly JsonSerializerOptions SerializerOptions = new()
         {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
@@ -40,6 +80,7 @@ namespace FMSimTools.Services
         {
             try
             {
+                ValidateTeamFileForSimulation(filePath);
                 return LoadTeam(filePath);
             }
             catch (Exception exception) when (
@@ -95,6 +136,57 @@ namespace FMSimTools.Services
             return filePath;
         }
 
+        public static void ValidateTeamFileForSimulation(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException("Team JSON file could not be found.", filePath);
+            }
+
+            using var document = JsonDocument.Parse(File.ReadAllText(filePath));
+            var root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+            {
+                throw CreateTeamJsonException(filePath, "The root value must be a JSON object.");
+            }
+
+            var name = GetRequiredString(root, "name", filePath);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw CreateTeamJsonException(filePath, "The 'name' field cannot be empty.");
+            }
+
+            var attackTactic = GetRequiredString(root, "attackTactic", filePath);
+            if (!ValidAttackTactics.Contains(attackTactic))
+            {
+                throw CreateTeamJsonException(filePath, $"Unknown attack tactic: {attackTactic}");
+            }
+
+            var defenseTactic = GetRequiredString(root, "defenseTactic", filePath);
+            if (!ValidDefenseTactics.Contains(defenseTactic))
+            {
+                throw CreateTeamJsonException(filePath, $"Unknown defense tactic: {defenseTactic}");
+            }
+
+            var players = GetRequiredProperty(root, "players", filePath);
+            if (players.ValueKind != JsonValueKind.Array)
+            {
+                throw CreateTeamJsonException(filePath, "The 'players' field must be an array.");
+            }
+
+            if (players.GetArrayLength() != 11)
+            {
+                throw CreateTeamJsonException(filePath, "A team must contain exactly 11 players.");
+            }
+
+            var playerIndex = 0;
+            foreach (var player in players.EnumerateArray())
+            {
+                playerIndex++;
+                ValidatePlayer(player, playerIndex, filePath);
+            }
+        }
+
         private static TeamPlayer CreateTeamPlayer(PlayerJson playerJson)
         {
             if (string.IsNullOrWhiteSpace(playerJson.Name) ||
@@ -134,6 +226,69 @@ namespace FMSimTools.Services
             {
                 throw new InvalidOperationException($"Not a valid team JSON file: {filePath}");
             }
+        }
+
+        private static void ValidatePlayer(JsonElement player, int playerIndex, string filePath)
+        {
+            if (player.ValueKind != JsonValueKind.Object)
+            {
+                throw CreateTeamJsonException(filePath, $"Player #{playerIndex} must be a JSON object.");
+            }
+
+            var name = GetRequiredString(player, "name", filePath);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw CreateTeamJsonException(filePath, $"Player #{playerIndex} has an empty name.");
+            }
+
+            var position = GetRequiredString(player, "position", filePath);
+            if (!ValidPositions.Contains(position))
+            {
+                throw CreateTeamJsonException(filePath, $"Player #{playerIndex} has an unknown position: {position}");
+            }
+
+            var attributes = GetRequiredProperty(player, "attributes", filePath);
+            if (attributes.ValueKind != JsonValueKind.Object)
+            {
+                throw CreateTeamJsonException(filePath, $"Player #{playerIndex} attributes must be a JSON object.");
+            }
+
+            foreach (var attributeName in RequiredPlayerAttributes)
+            {
+                var attribute = GetRequiredProperty(attributes, attributeName, filePath);
+                if (attribute.ValueKind != JsonValueKind.Number || !attribute.TryGetInt32(out _))
+                {
+                    throw CreateTeamJsonException(
+                        filePath,
+                        $"Player #{playerIndex} attribute '{attributeName}' must be a number.");
+                }
+            }
+        }
+
+        private static JsonElement GetRequiredProperty(JsonElement element, string propertyName, string filePath)
+        {
+            if (element.TryGetProperty(propertyName, out var value))
+            {
+                return value;
+            }
+
+            throw CreateTeamJsonException(filePath, $"Missing required JSON field: {propertyName}");
+        }
+
+        private static string GetRequiredString(JsonElement element, string propertyName, string filePath)
+        {
+            var value = GetRequiredProperty(element, propertyName, filePath);
+            if (value.ValueKind != JsonValueKind.String)
+            {
+                throw CreateTeamJsonException(filePath, $"JSON field '{propertyName}' must be a string.");
+            }
+
+            return value.GetString() ?? string.Empty;
+        }
+
+        private static InvalidOperationException CreateTeamJsonException(string filePath, string message)
+        {
+            return new InvalidOperationException($"{Path.GetFileName(filePath)} is not a valid team file. {message}");
         }
 
         private static PlayerJson CreatePlayerJson(TeamPlayer player)

@@ -1,3 +1,4 @@
+using System.Windows;
 using FMSimTools.Models;
 using FMSimTools.ViewModels;
 using Wpf.Ui.Controls;
@@ -16,6 +17,7 @@ namespace FMSimTools.Views
             DataContext = viewModel;
             viewModel.CloseRequested += ViewModel_CloseRequested;
             viewModel.SimulationCompleted += ViewModel_SimulationCompleted;
+            viewModel.SimulationFailed += ViewModel_SimulationFailed;
         }
 
         public event EventHandler<SimulationResult>? SimulationCompleted;
@@ -29,6 +31,16 @@ namespace FMSimTools.Views
         {
             SimulationCompleted?.Invoke(this, result);
             Close();
+        }
+
+        private void ViewModel_SimulationFailed(object? sender, string message)
+        {
+            System.Windows.MessageBox.Show(
+                this,
+                message,
+                "Simulation failed",
+                System.Windows.MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
 }

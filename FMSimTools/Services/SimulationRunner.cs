@@ -19,6 +19,9 @@ namespace FMSimTools.Services
                 throw new FileNotFoundException("FMSim.exe could not be found.", executablePath);
             }
 
+            TeamJsonStore.ValidateTeamFileForSimulation(homeTeam.FilePath);
+            TeamJsonStore.ValidateTeamFileForSimulation(awayTeam.FilePath);
+
             var logsDirectory = AppPaths.LogsDirectory;
             Directory.CreateDirectory(logsDirectory);
 
