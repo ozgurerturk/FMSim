@@ -5,8 +5,7 @@
 // Breadth-First Search but with randomizer
 std::vector<Zone> PathFinder::FindPath(const ZoneGraph& graph,
     Zone startZone,
-    Zone targetZone)
-{
+    Zone targetZone) {
     // Random number generator setup
     std::random_device rd;
     std::mt19937 g(rd());
@@ -20,13 +19,11 @@ std::vector<Zone> PathFinder::FindPath(const ZoneGraph& graph,
     queue.push(startZone);
     visited[startZone] = true;
 
-    while (!queue.empty())
-    {
+    while (!queue.empty()) {
         Zone curr = queue.front();
         queue.pop();
 
-        if (curr == targetZone)
-        {
+        if (curr == targetZone) {
             break;
         }
 
@@ -36,26 +33,21 @@ std::vector<Zone> PathFinder::FindPath(const ZoneGraph& graph,
 
         std::shuffle(shuffled.begin(), shuffled.end(), g);
 
-		// Explore the adjacent zones in random order
-        for (const auto& next: shuffled)
-        {
-            if (!visited[next])
-            {
+        // Explore the adjacent zones in random order
+        for (const auto& next : shuffled) {
+            if (!visited[next]) {
                 visited[next] = true;
                 parent[next] = curr;
                 queue.push(next);
             }
         }
-
     }
 
-    if (!visited[targetZone])
-    {
+    if (!visited[targetZone]) {
         return {};
     }
 
-    for (auto at = targetZone; at != startZone; at = parent[at])
-    {
+    for (auto at = targetZone; at != startZone; at = parent[at]) {
         path.push_back(at);
     }
 

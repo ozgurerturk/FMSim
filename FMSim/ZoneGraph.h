@@ -3,8 +3,7 @@
 #include <map>
 #include "MatchDefinitions.h"
 
-class ZoneGraph
-{
+class ZoneGraph {
 public:
     ZoneGraph();
     const std::vector<Zone>& GetAdjacent(Zone zone) const;

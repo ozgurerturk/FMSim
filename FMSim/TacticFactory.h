@@ -2,19 +2,17 @@
 #include "MatchDefinitions.h"
 #include "Tactics.h"
 
-class TacticFactory
-{
+class TacticFactory {
 public:
     static Tactic CreateWingPlay();
     static Tactic CreateLongBall();
     static Tactic CreateTikiTaka();
     static Tactic CreateCounterAttack();
-	static Tactic CreatePossessionGame();
+    static Tactic CreatePossessionGame();
 
-	static DefenseTactic CreatePressing();
-	static DefenseTactic CreateManMarking();
-	static DefenseTactic CreateZonalMarking();
-	static DefenseTactic CreateCounterPressing();
+    static DefenseTactic CreatePressing();
+    static DefenseTactic CreateManMarking();
+    static DefenseTactic CreateZonalMarking();
+    static DefenseTactic CreateCounterPressing();
 private:
-
 };

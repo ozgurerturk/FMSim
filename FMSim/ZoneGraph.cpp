@@ -1,7 +1,6 @@
 #include "ZoneGraph.h"
 
-ZoneGraph::ZoneGraph()
-{
+ZoneGraph::ZoneGraph() {
     adjacency = {
         { Zone::H1, {Zone::H2, Zone::M1 } },
         { Zone::H2, {Zone::H1, Zone::H3, Zone::M2 } },
@@ -17,7 +16,6 @@ ZoneGraph::ZoneGraph()
     };
 }
 
-const std::vector<Zone>& ZoneGraph::GetAdjacent(Zone zone) const
-{
+const std::vector<Zone>& ZoneGraph::GetAdjacent(Zone zone) const {
     return adjacency.at(zone);
 }

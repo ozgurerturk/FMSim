@@ -3,8 +3,7 @@
 #include "MatchDefinitions.h"
 #include "ZoneGraph.h"
 
-class PathFinder
-{
+class PathFinder {
 public:
     static std::vector<Zone> FindPath(
         const ZoneGraph& graph,

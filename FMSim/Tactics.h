@@ -3,21 +3,18 @@
 #include <vector>
 #include "MatchEvents.h"
 
-struct ZoneStep
-{
+struct ZoneStep {
     Zone from;
     Zone to;
     bool isLongBall = false;
     bool isRotation = false;
 };
 
-struct ZonePath
-{
+struct ZonePath {
     std::vector<ZoneStep> steps;
 };
 
-class Tactic
-{
+class Tactic {
 public:
     Tactic();
     Tactic(TacticType type);
@@ -37,8 +34,7 @@ private:
     bool newAttackPathChosen = false;
 };
 
-class DefenseTactic
-{
+class DefenseTactic {
 public:
     DefenseTactic();
     DefenseTactic(DefenseTacticType type);
