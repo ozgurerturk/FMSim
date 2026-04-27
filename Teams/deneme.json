@@ -1,0 +1,194 @@
+{
+  "name": "Deneme",
+  "attackTactic": "TikiTaka",
+  "defenseTactic": "Pressing",
+  "players": [
+    {
+      "name": "Efe Keskin",
+      "position": "Goalkeeper",
+      "attributes": {
+        "defense": 29,
+        "attack": 21,
+        "pace": 57,
+        "stamina": 74,
+        "passing": 61,
+        "tackle": 14,
+        "dribbling": 32,
+        "shooting": 10,
+        "physicality": 67,
+        "jumping": 91,
+        "reactionTime": 90
+      }
+    },
+    {
+      "name": "Kerem Polat",
+      "position": "Defender",
+      "attributes": {
+        "defense": 83,
+        "attack": 32,
+        "pace": 58,
+        "stamina": 85,
+        "passing": 53,
+        "tackle": 71,
+        "dribbling": 47,
+        "shooting": 42,
+        "physicality": 81,
+        "jumping": 71,
+        "reactionTime": 57
+      }
+    },
+    {
+      "name": "Baran Aksoy",
+      "position": "Defender",
+      "attributes": {
+        "defense": 87,
+        "attack": 52,
+        "pace": 45,
+        "stamina": 89,
+        "passing": 59,
+        "tackle": 82,
+        "dribbling": 30,
+        "shooting": 41,
+        "physicality": 84,
+        "jumping": 60,
+        "reactionTime": 67
+      }
+    },
+    {
+      "name": "Ozan Sahin",
+      "position": "Defender",
+      "attributes": {
+        "defense": 75,
+        "attack": 33,
+        "pace": 57,
+        "stamina": 63,
+        "passing": 57,
+        "tackle": 80,
+        "dribbling": 49,
+        "shooting": 41,
+        "physicality": 74,
+        "jumping": 88,
+        "reactionTime": 62
+      }
+    },
+    {
+      "name": "Alp Demir",
+      "position": "Defender",
+      "attributes": {
+        "defense": 71,
+        "attack": 42,
+        "pace": 60,
+        "stamina": 75,
+        "passing": 55,
+        "tackle": 76,
+        "dribbling": 33,
+        "shooting": 44,
+        "physicality": 89,
+        "jumping": 86,
+        "reactionTime": 69
+      }
+    },
+    {
+      "name": "Kaan Aydin",
+      "position": "Midfielder",
+      "attributes": {
+        "defense": 53,
+        "attack": 76,
+        "pace": 54,
+        "stamina": 73,
+        "passing": 72,
+        "tackle": 61,
+        "dribbling": 73,
+        "shooting": 44,
+        "physicality": 81,
+        "jumping": 68,
+        "reactionTime": 68
+      }
+    },
+    {
+      "name": "Tuna Aksoy",
+      "position": "Midfielder",
+      "attributes": {
+        "defense": 74,
+        "attack": 67,
+        "pace": 75,
+        "stamina": 71,
+        "passing": 90,
+        "tackle": 51,
+        "dribbling": 65,
+        "shooting": 56,
+        "physicality": 57,
+        "jumping": 71,
+        "reactionTime": 60
+      }
+    },
+    {
+      "name": "Arda Turan",
+      "position": "Midfielder",
+      "attributes": {
+        "defense": 49,
+        "attack": 62,
+        "pace": 69,
+        "stamina": 94,
+        "passing": 93,
+        "tackle": 72,
+        "dribbling": 67,
+        "shooting": 75,
+        "physicality": 62,
+        "jumping": 55,
+        "reactionTime": 68
+      }
+    },
+    {
+      "name": "Emir Turan",
+      "position": "Midfielder",
+      "attributes": {
+        "defense": 66,
+        "attack": 54,
+        "pace": 67,
+        "stamina": 73,
+        "passing": 83,
+        "tackle": 59,
+        "dribbling": 74,
+        "shooting": 76,
+        "physicality": 77,
+        "jumping": 42,
+        "reactionTime": 64
+      }
+    },
+    {
+      "name": "Doruk Arslan",
+      "position": "Attacker",
+      "attributes": {
+        "defense": 23,
+        "attack": 94,
+        "pace": 96,
+        "stamina": 76,
+        "passing": 73,
+        "tackle": 19,
+        "dribbling": 91,
+        "shooting": 97,
+        "physicality": 81,
+        "jumping": 66,
+        "reactionTime": 64
+      }
+    },
+    {
+      "name": "Kerem Aydin",
+      "position": "Attacker",
+      "attributes": {
+        "defense": 32,
+        "attack": 71,
+        "pace": 93,
+        "stamina": 76,
+        "passing": 56,
+        "tackle": 38,
+        "dribbling": 71,
+        "shooting": 78,
+        "physicality": 64,
+        "jumping": 57,
+        "reactionTime": 70
+      }
+    }
+  ]
+}
