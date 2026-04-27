@@ -1,0 +1,297 @@
+<ui:FluentWindow x:Class="FMSimTools.Views.TeamViewerForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FMSimTools"
+        xmlns:converters="clr-namespace:FMSimTools.Converters"
+        xmlns:viewmodels="clr-namespace:FMSimTools.ViewModels"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:components="clr-namespace:FMSimTools.Components"
+        WindowState="Maximized"
+        WindowStyle="None"
+                 d:DataContext="{d:DesignInstance Type=viewmodels:TeamViewerViewModel}"
+        mc:Ignorable="d"
+        Title="TeamViewerForm" Height="620" Width="800">
+    <ui:FluentWindow.Resources>
+        <converters:PlayerPositionBrushConverter x:Key="PlayerPositionBrushConverter" />
+        <Style x:Key="PlayerDotStyle" TargetType="Border">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="CornerRadius" Value="15" />
+            <Setter Property="Background" Value="#EAF2FF" />
+            <Setter Property="BorderBrush" Value="#1E4F8A" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="Margin" Value="0 10" />
+        </Style>
+        <Style x:Key="GoalKeeperDotStyle"
+               TargetType="Border"
+               BasedOn="{StaticResource PlayerDotStyle}">
+            <Setter Property="Background" Value="#FFF2B8" />
+            <Setter Property="BorderBrush" Value="#9A6A00" />
+        </Style>
+        <Style x:Key="PlayerListItemStyle" TargetType="ListViewItem">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Margin" Value="0 1" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border x:Name="RowBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#18000000"
+                                BorderThickness="0 0 0 1">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="RowBorder" Property="Background" Value="#F5F8FC" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="RowBorder" Property="Background" Value="#EAF2FB" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </ui:FluentWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="280" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="20" />
+        </Grid.ColumnDefinitions>
+        <components:FMTitleBar Grid.Row="0"
+                       Grid.ColumnSpan="4"
+                       Title="Team Viewer" />
+        <Viewbox Grid.Column="2"
+                 Grid.Row="2"
+                 Stretch="Uniform"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center">
+            <Grid Width="480"
+                  Height="640">
+                <Image x:Name="imgPitch"
+                       Source="/Football_field.png"
+                       Stretch="Uniform" />
+                <ItemsControl ItemsSource="{Binding FormationLines}"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch"
+                              Margin="34 40 34 112">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="4" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Background="Transparent"
+                                  AllowDrop="True"
+                                  DragOver="FormationLine_DragOver"
+                                  Drop="FormationLine_Drop">
+                                <ItemsControl ItemsSource="{Binding PlayerSlots}"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Center">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Rows="1" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid>
+                                                <Border Style="{StaticResource PlayerDotStyle}"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Cursor="SizeAll"
+                                                        ToolTip="{Binding TooltipText}"
+                                                        PreviewMouseMove="PlayerDot_PreviewMouseMove">
+                                                    <ui:TextBlock Text="{Binding DisplayText}"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"
+                                                                  FontWeight="SemiBold"
+                                                                  Foreground="#15345F" />
+                                                </Border>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Border Style="{StaticResource GoalKeeperDotStyle}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Margin="0 0 0 46"
+                        ToolTip="{Binding GoalKeeperSlot.TooltipText}">
+                    <ui:TextBlock Text="GK"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  FontSize="11"
+                                  FontWeight="SemiBold"
+                                  Foreground="#4F3700" />
+                </Border>
+            </Grid>
+        </Viewbox>
+        <ui:TextBlock Text="Team Name" Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" />
+        <ui:TextBox Grid.Row="2"
+                    Grid.Column="1"
+                    Width="180"
+                    Margin="0 22 0 0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Text="{Binding TeamName, UpdateSourceTrigger=PropertyChanged}" />
+        <ui:TextBlock Text="Attack Tactic" Grid.Row="2" Grid.Column="1" Margin="0 62 0 0" />
+        <ComboBox Grid.Column="1"
+                  Grid.Row="2"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Width="180"
+                  Margin="0 84 0 0"
+                  ItemsSource="{Binding AvailableAttackTactics}"
+                  SelectedItem="{Binding SelectedAttackTactic, Mode=TwoWay}" />
+        <ui:TextBlock Text="Defense Tactic" Grid.Row="2" Grid.Column="1" Margin="0 124 0 0" />
+        <ComboBox Grid.Column="1"
+                  Grid.Row="2"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Width="180"
+                  Margin="0 146 0 0"
+                  ItemsSource="{Binding AvailableDefenseTactics}"
+                  SelectedItem="{Binding SelectedDefenseTactic, Mode=TwoWay}" />
+        <ui:TextBlock Text="Formations" Grid.Row="2" Grid.Column="1" Margin="0 186 0 0" />
+        <ComboBox Grid.Column="1"  Grid.Row="2"
+                  HorizontalAlignment="Left" VerticalAlignment="Top"
+                  Width="120" Margin="0 208 0 0"
+                  x:Name="cmbFormations"
+                  ItemsSource="{Binding Formations}"
+                  SelectedItem="{Binding SelectedFormation, Mode=TwoWay}"
+                  DisplayMemberPath="Name" />
+        <ui:TextBlock Text="Current" Grid.Row="2" Grid.Column="1" Margin="0 245 0 0" />
+        <ui:TextBlock Grid.Row="2"
+                      Grid.Column="1"
+                      Margin="0 268 0 0"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top"
+                      FontSize="18"
+                      FontWeight="SemiBold"
+                      Text="{Binding CurrentFormationName}" />
+        <ui:Button Grid.Row="2"
+                   Grid.Column="1"
+                   Content="Add Player"
+                   Width="120"
+                   Margin="0 306 0 0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Appearance="Primary"
+                   Command="{Binding AddPlayerCommand}" />
+        <ui:Button Grid.Row="2"
+                   Grid.Column="1"
+                   Content="Fill Random Team"
+                   Width="140"
+                   Margin="128 306 0 0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Command="{Binding FillRandomTeamCommand}" />
+        <ui:Button Grid.Row="2"
+                   Grid.Column="1"
+                   Content="Save Team"
+                   Width="120"
+                   Margin="0 344 0 0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Appearance="Success"
+                   Command="{Binding SaveTeamCommand}" />
+        <ui:Button Grid.Row="2"
+                   Grid.Column="1"
+                   Content="Cancel"
+                   Width="120"
+                   Margin="128 344 0 0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Command="{Binding CancelCommand}" />
+        <ui:TextBlock Grid.Row="2"
+                      Grid.Column="1"
+                      Margin="0 382 12 0"
+                      HorizontalAlignment="Left"
+                      VerticalAlignment="Top"
+                      FontSize="11"
+                      TextWrapping="Wrap"
+                      Text="{Binding SaveStatusMessage}" />
+        <Border Grid.Row="2"
+                Grid.Column="1"
+                Margin="0 410 12 0"
+                Background="#FFFFFFFF"
+                BorderBrush="#CBD5E1"
+                BorderThickness="1"
+                CornerRadius="8"
+                ClipToBounds="True">
+            <ui:ListView ItemsSource="{Binding TeamPlayerSlots}"
+                         ItemContainerStyle="{StaticResource PlayerListItemStyle}"
+                         Background="#FFFFFFFF"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ui:ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ui:Button Command="{Binding DataContext.EditPlayerSlotCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                   CommandParameter="{Binding}"
+                                   HorizontalContentAlignment="Stretch"
+                                   Background="Transparent"
+                                   BorderThickness="0"
+                                   Padding="0"
+                                   Cursor="Hand">
+                            <ui:Button.Template>
+                                <ControlTemplate TargetType="ui:Button">
+                                    <ContentPresenter />
+                                </ControlTemplate>
+                            </ui:Button.Template>
+                            <Grid MinHeight="42"
+                                  Background="{Binding PlayerOrDefaultPosition, Converter={StaticResource PlayerPositionBrushConverter}}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="4" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Border Background="{Binding PlayerOrDefaultPosition, Converter={StaticResource PlayerPositionBrushConverter}, ConverterParameter=Accent}" />
+                                <StackPanel Grid.Column="1"
+                                            Margin="10 6 8 6">
+                                    <ui:TextBlock Text="{Binding DisplayName}"
+                                                  FontSize="12"
+                                                  FontWeight="SemiBold"
+                                                  Foreground="#202833"
+                                                  TextTrimming="CharacterEllipsis" />
+                                    <ui:TextBlock Text="{Binding SlotName}"
+                                                  FontSize="10"
+                                                  Foreground="#6E7784"
+                                                  TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                                <Border Grid.Column="2"
+                                        Margin="0 9 10 9"
+                                        Padding="8 2"
+                                        CornerRadius="8"
+                                        Background="#F8FFFFFF"
+                                        BorderBrush="{Binding PlayerOrDefaultPosition, Converter={StaticResource PlayerPositionBrushConverter}, ConverterParameter=Accent}"
+                                        BorderThickness="1">
+                                    <ui:TextBlock Text="{Binding PositionText}"
+                                                  FontSize="10"
+                                                  FontWeight="SemiBold"
+                                                  Foreground="{Binding PlayerOrDefaultPosition, Converter={StaticResource PlayerPositionBrushConverter}, ConverterParameter=Foreground}" />
+                                </Border>
+                            </Grid>
+                        </ui:Button>
+                    </DataTemplate>
+                </ui:ListView.ItemTemplate>
+            </ui:ListView>
+        </Border>
+    </Grid>
+</ui:FluentWindow>

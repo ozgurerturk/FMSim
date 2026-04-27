@@ -1,0 +1,97 @@
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using FMSimTools.Models;
+using FMSimTools.Services;
+
+namespace FMSimTools.ViewModels
+{
+    public partial class SimulationSetupViewModel : ObservableObject
+    {
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(StartSimulationCommand))]
+        private SavedTeam? _selectedHomeTeam;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(StartSimulationCommand))]
+        private SavedTeam? _selectedAwayTeam;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(StartSimulationCommand))]
+        private int _selectedSimulationMinutes = 6;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(StartSimulationCommand))]
+        private int _simulationCount = 1;
+
+        [ObservableProperty]
+        private string _statusMessage = string.Empty;
+
+        [ObservableProperty]
+        private bool _isRunning;
+
+        public SimulationSetupViewModel()
+        {
+            Teams = new ObservableCollection<SavedTeam>(
+                TeamJsonStore.LoadTeams(TeamJsonStore.GetTeamsDirectory()));
+        }
+
+        public ObservableCollection<SavedTeam> Teams { get; }
+
+        public ObservableCollection<int> AvailableSimulationMinutes { get; } = [6, 12, 24];
+
+        public event EventHandler<SimulationResult>? SimulationCompleted;
+
+        public event EventHandler? CloseRequested;
+
+        [RelayCommand(CanExecute = nameof(CanStartSimulation))]
+        private async Task OnStartSimulationAsync()
+        {
+            if (SelectedHomeTeam is null || SelectedAwayTeam is null)
+            {
+                return;
+            }
+
+            try
+            {
+                IsRunning = true;
+                StatusMessage = "Simulation running...";
+                StartSimulationCommand.NotifyCanExecuteChanged();
+
+                var result = await SimulationRunner.RunAsync(
+                    SelectedHomeTeam,
+                    SelectedAwayTeam,
+                    SelectedSimulationMinutes,
+                    SimulationCount);
+
+                StatusMessage = "Simulation completed.";
+                SimulationCompleted?.Invoke(this, result);
+            }
+            catch (Exception exception)
+            {
+                StatusMessage = $"Simulation failed: {exception.Message}";
+            }
+            finally
+            {
+                IsRunning = false;
+                StartSimulationCommand.NotifyCanExecuteChanged();
+            }
+        }
+
+        [RelayCommand]
+        private void OnCancel()
+        {
+            CloseRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        private bool CanStartSimulation()
+        {
+            return !IsRunning &&
+                   SelectedHomeTeam is not null &&
+                   SelectedAwayTeam is not null &&
+                   SelectedHomeTeam.FilePath != SelectedAwayTeam.FilePath &&
+                   AvailableSimulationMinutes.Contains(SelectedSimulationMinutes) &&
+                   SimulationCount > 0;
+        }
+    }
+}

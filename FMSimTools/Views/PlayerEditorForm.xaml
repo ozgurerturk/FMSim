@@ -1,0 +1,130 @@
+<ui:FluentWindow x:Class="FMSimTools.Views.PlayerEditorForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:FMSimTools.Converters"
+        xmlns:viewmodels="clr-namespace:FMSimTools.ViewModels"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:components="clr-namespace:FMSimTools.Components"
+                 d:DataContext="{d:DesignInstance Type=viewmodels:PlayerEditorViewModel}"
+        mc:Ignorable="d"
+        Title="Player Editor"
+        Height="560"
+        Width="420"
+        WindowStartupLocation="CenterOwner">
+    <ui:FluentWindow.Resources>
+        <converters:AttributeImportanceConverter x:Key="AttributeImportanceConverter" />
+        <converters:PlayerPositionBrushConverter x:Key="PlayerPositionBrushConverter" />
+    </ui:FluentWindow.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="36" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <components:FMTitleBar Grid.Row="0"
+                       Grid.ColumnSpan="4"
+                       Title="Add Player" />
+
+        <StackPanel Grid.Row="1" Margin="16 12 16 0">
+            <ui:TextBlock Text="Name" />
+            <ui:TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
+                        Margin="0 4 0 12" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Margin="16 0">
+            <ui:TextBlock Text="Position" />
+            <ComboBox ItemsSource="{Binding AvailablePositions}"
+                      SelectedItem="{Binding SelectedPosition, Mode=TwoWay}"
+                      Margin="0 4 0 12" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="3"
+                      Margin="16 0"
+                      VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding Attributes}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border CornerRadius="6"
+                                BorderThickness="1"
+                                Padding="8 6"
+                                Margin="0 3">
+                            <Border.Background>
+                                <MultiBinding Converter="{StaticResource AttributeImportanceConverter}"
+                                              ConverterParameter="Background">
+                                    <Binding Path="Name" />
+                                    <Binding Path="DataContext.SelectedPosition"
+                                             RelativeSource="{RelativeSource AncestorType=Window}" />
+                                </MultiBinding>
+                            </Border.Background>
+                            <Border.BorderBrush>
+                                <MultiBinding Converter="{StaticResource AttributeImportanceConverter}"
+                                              ConverterParameter="BorderBrush">
+                                    <Binding Path="Name" />
+                                    <Binding Path="DataContext.SelectedPosition"
+                                             RelativeSource="{RelativeSource AncestorType=Window}" />
+                                </MultiBinding>
+                            </Border.BorderBrush>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="112" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="46" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBlock Text="{Binding Name}"
+                                          VerticalAlignment="Center">
+                                    <ui:TextBlock.FontWeight>
+                                        <MultiBinding Converter="{StaticResource AttributeImportanceConverter}"
+                                                      ConverterParameter="FontWeight">
+                                            <Binding Path="Name" />
+                                            <Binding Path="DataContext.SelectedPosition"
+                                                     RelativeSource="{RelativeSource AncestorType=Window}" />
+                                        </MultiBinding>
+                                    </ui:TextBlock.FontWeight>
+                                    <ui:TextBlock.Opacity>
+                                        <MultiBinding Converter="{StaticResource AttributeImportanceConverter}"
+                                                      ConverterParameter="Opacity">
+                                            <Binding Path="Name" />
+                                            <Binding Path="DataContext.SelectedPosition"
+                                                     RelativeSource="{RelativeSource AncestorType=Window}" />
+                                        </MultiBinding>
+                                    </ui:TextBlock.Opacity>
+                                </ui:TextBlock>
+                                <Slider Grid.Column="1"
+                                        Minimum="0"
+                                        Maximum="100"
+                                        TickFrequency="5"
+                                        IsSnapToTickEnabled="True"
+                                        Value="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <ui:TextBox Grid.Column="2"
+                                            Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            Margin="8 0 0 0"
+                                            HorizontalContentAlignment="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="4"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="16 14 16 16">
+            <ui:Button Content="Random Player"
+                       Width="118"
+                       Margin="0 0 8 0"
+                       Command="{Binding RandomizePlayerCommand}" />
+            <ui:Button Content="Cancel"
+                       Width="82"
+                       Margin="0 0 8 0"
+                       Command="{Binding CancelCommand}" />
+            <ui:Button Content="Save"
+                       Width="82"
+                       Appearance="Primary"
+                       Command="{Binding SaveCommand}" />
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>
