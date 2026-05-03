@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace FMSimTools.Models
 {
     public static class FormationCatalog
