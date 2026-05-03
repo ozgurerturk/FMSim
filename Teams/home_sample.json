@@ -1,194 +1,194 @@
 {
-  "name": "Istanbul Stars",
-  "attackTactic": "Possession",
-  "defenseTactic": "Pressing",
-  "players": [
-    {
-      "name": "Home GK",
-      "position": "Goalkeeper",
-      "attributes": {
-        "defense": 12,
-        "attack": 8,
-        "pace": 10,
-        "stamina": 72,
-        "passing": 50,
-        "tackle": 15,
-        "dribbling": 10,
-        "shooting": 8,
-        "physicality": 55,
-        "jumping": 76,
-        "reactionTime": 76
-      }
-    },
-    {
-      "name": "Home RB",
-      "position": "Defender",
-      "attributes": {
-        "defense": 68,
-        "attack": 45,
-        "pace": 66,
-        "stamina": 78,
-        "passing": 58,
-        "tackle": 68,
-        "dribbling": 42,
-        "shooting": 30,
-        "physicality": 64,
-        "jumping": 58,
-        "reactionTime": 62
-      }
-    },
-    {
-      "name": "Home CB1",
-      "position": "Defender",
-      "attributes": {
-        "defense": 72,
-        "attack": 35,
-        "pace": 54,
-        "stamina": 76,
-        "passing": 52,
-        "tackle": 74,
-        "dribbling": 30,
-        "shooting": 28,
-        "physicality": 74,
-        "jumping": 72,
-        "reactionTime": 68
-      }
-    },
-    {
-      "name": "Home CB2",
-      "position": "Defender",
-      "attributes": {
-        "defense": 70,
-        "attack": 36,
-        "pace": 52,
-        "stamina": 75,
-        "passing": 50,
-        "tackle": 72,
-        "dribbling": 28,
-        "shooting": 28,
-        "physicality": 76,
-        "jumping": 74,
-        "reactionTime": 66
-      }
-    },
-    {
-      "name": "Home LB",
-      "position": "Defender",
-      "attributes": {
-        "defense": 67,
-        "attack": 48,
-        "pace": 67,
-        "stamina": 78,
-        "passing": 60,
-        "tackle": 66,
-        "dribbling": 44,
-        "shooting": 32,
-        "physicality": 64,
-        "jumping": 60,
-        "reactionTime": 63
-      }
-    },
-    {
-      "name": "Home DM",
-      "position": "Midfielder",
-      "attributes": {
-        "defense": 62,
-        "attack": 58,
-        "pace": 60,
-        "stamina": 82,
-        "passing": 68,
-        "tackle": 64,
-        "dribbling": 55,
-        "shooting": 44,
-        "physicality": 68,
-        "jumping": 62,
-        "reactionTime": 64
-      }
-    },
-    {
-      "name": "Home CM1",
-      "position": "Midfielder",
-      "attributes": {
-        "defense": 58,
-        "attack": 66,
-        "pace": 64,
-        "stamina": 84,
-        "passing": 74,
-        "tackle": 58,
-        "dribbling": 64,
-        "shooting": 56,
-        "physicality": 66,
-        "jumping": 60,
-        "reactionTime": 65
-      }
-    },
-    {
-      "name": "Home CM2",
-      "position": "Midfielder",
-      "attributes": {
-        "defense": 56,
-        "attack": 68,
-        "pace": 65,
-        "stamina": 83,
-        "passing": 76,
-        "tackle": 54,
-        "dribbling": 66,
-        "shooting": 58,
-        "physicality": 64,
-        "jumping": 58,
-        "reactionTime": 66
-      }
-    },
-    {
-      "name": "Home RW",
-      "position": "Attacker",
-      "attributes": {
-        "defense": 34,
-        "attack": 72,
-        "pace": 78,
-        "stamina": 79,
-        "passing": 68,
-        "tackle": 32,
-        "dribbling": 74,
-        "shooting": 66,
-        "physicality": 60,
-        "jumping": 58,
-        "reactionTime": 63
-      }
-    },
-    {
-      "name": "Home ST",
-      "position": "Attacker",
-      "attributes": {
-        "defense": 30,
-        "attack": 76,
-        "pace": 74,
-        "stamina": 77,
-        "passing": 60,
-        "tackle": 28,
-        "dribbling": 72,
-        "shooting": 74,
-        "physicality": 72,
-        "jumping": 68,
-        "reactionTime": 64
-      }
-    },
-    {
-      "name": "Home LW",
-      "position": "Attacker",
-      "attributes": {
-        "defense": 34,
-        "attack": 71,
-        "pace": 79,
-        "stamina": 79,
-        "passing": 69,
-        "tackle": 30,
-        "dribbling": 75,
-        "shooting": 67,
-        "physicality": 59,
-        "jumping": 57,
-        "reactionTime": 63
-      }
-    }
-  ]
+    "name": "Istanbul Stars",
+    "attackTactic": "Possession",
+    "defenseTactic": "Pressing",
+    "players": [
+        {
+            "name": "Home GK",
+            "position": "Goalkeeper",
+            "attributes": {
+                "defense": 12,
+                "attack": 8,
+                "pace": 10,
+                "stamina": 72,
+                "passing": 50,
+                "tackle": 15,
+                "dribbling": 10,
+                "shooting": 8,
+                "physicality": 55,
+                "jumping": 76,
+                "reactionTime": 76
+            }
+        },
+        {
+            "name": "Home RB",
+            "position": "Defender",
+            "attributes": {
+                "defense": 68,
+                "attack": 45,
+                "pace": 66,
+                "stamina": 78,
+                "passing": 58,
+                "tackle": 68,
+                "dribbling": 42,
+                "shooting": 30,
+                "physicality": 64,
+                "jumping": 58,
+                "reactionTime": 62
+            }
+        },
+        {
+            "name": "Home CB1",
+            "position": "Defender",
+            "attributes": {
+                "defense": 72,
+                "attack": 35,
+                "pace": 54,
+                "stamina": 76,
+                "passing": 52,
+                "tackle": 74,
+                "dribbling": 30,
+                "shooting": 28,
+                "physicality": 74,
+                "jumping": 72,
+                "reactionTime": 68
+            }
+        },
+        {
+            "name": "Home CB2",
+            "position": "Defender",
+            "attributes": {
+                "defense": 70,
+                "attack": 36,
+                "pace": 52,
+                "stamina": 75,
+                "passing": 50,
+                "tackle": 72,
+                "dribbling": 28,
+                "shooting": 28,
+                "physicality": 76,
+                "jumping": 74,
+                "reactionTime": 66
+            }
+        },
+        {
+            "name": "Home LB",
+            "position": "Defender",
+            "attributes": {
+                "defense": 67,
+                "attack": 48,
+                "pace": 67,
+                "stamina": 78,
+                "passing": 60,
+                "tackle": 66,
+                "dribbling": 44,
+                "shooting": 32,
+                "physicality": 64,
+                "jumping": 60,
+                "reactionTime": 63
+            }
+        },
+        {
+            "name": "Home DM",
+            "position": "Midfielder",
+            "attributes": {
+                "defense": 62,
+                "attack": 58,
+                "pace": 60,
+                "stamina": 82,
+                "passing": 68,
+                "tackle": 64,
+                "dribbling": 55,
+                "shooting": 44,
+                "physicality": 68,
+                "jumping": 62,
+                "reactionTime": 64
+            }
+        },
+        {
+            "name": "Home CM1",
+            "position": "Midfielder",
+            "attributes": {
+                "defense": 58,
+                "attack": 66,
+                "pace": 64,
+                "stamina": 84,
+                "passing": 74,
+                "tackle": 58,
+                "dribbling": 64,
+                "shooting": 56,
+                "physicality": 66,
+                "jumping": 60,
+                "reactionTime": 65
+            }
+        },
+        {
+            "name": "Home CM2",
+            "position": "Midfielder",
+            "attributes": {
+                "defense": 56,
+                "attack": 68,
+                "pace": 65,
+                "stamina": 83,
+                "passing": 76,
+                "tackle": 54,
+                "dribbling": 66,
+                "shooting": 58,
+                "physicality": 64,
+                "jumping": 58,
+                "reactionTime": 66
+            }
+        },
+        {
+            "name": "Home RW",
+            "position": "Attacker",
+            "attributes": {
+                "defense": 34,
+                "attack": 72,
+                "pace": 78,
+                "stamina": 79,
+                "passing": 68,
+                "tackle": 32,
+                "dribbling": 74,
+                "shooting": 66,
+                "physicality": 60,
+                "jumping": 58,
+                "reactionTime": 63
+            }
+        },
+        {
+            "name": "Home ST",
+            "position": "Attacker",
+            "attributes": {
+                "defense": 30,
+                "attack": 76,
+                "pace": 74,
+                "stamina": 77,
+                "passing": 60,
+                "tackle": 28,
+                "dribbling": 72,
+                "shooting": 74,
+                "physicality": 72,
+                "jumping": 68,
+                "reactionTime": 64
+            }
+        },
+        {
+            "name": "Home LW",
+            "position": "Attacker",
+            "attributes": {
+                "defense": 34,
+                "attack": 71,
+                "pace": 79,
+                "stamina": 79,
+                "passing": 69,
+                "tackle": 30,
+                "dribbling": 75,
+                "shooting": 67,
+                "physicality": 59,
+                "jumping": 57,
+                "reactionTime": 63
+            }
+        }
+    ]
 }
