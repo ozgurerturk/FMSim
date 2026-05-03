@@ -31,6 +31,8 @@ namespace FMSimTools.ViewModels
 
         public event EventHandler? MatchHistoryRequested;
 
+        public event EventHandler? MatchViewerRequested;
+
         [RelayCommand]
         private void OnKickOff()
         {
@@ -41,6 +43,12 @@ namespace FMSimTools.ViewModels
         private void OnMatchHistory()
         {
             MatchHistoryRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        [RelayCommand]
+        private void OnMatchViewer()
+        {
+            MatchViewerRequested?.Invoke(this, EventArgs.Empty);
         }
 
         [RelayCommand]

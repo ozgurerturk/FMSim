@@ -1,5 +1,5 @@
-using FMSimTools.ViewModels;
 using FMSimTools.Models;
+using FMSimTools.ViewModels;
 using Wpf.Ui.Controls;
 
 namespace FMSimTools.Views
@@ -20,6 +20,17 @@ namespace FMSimTools.Views
             viewModel.EditTeamRequested += ViewModel_EditTeamRequested;
             viewModel.KickOffRequested += ViewModel_KickOffRequested;
             viewModel.MatchHistoryRequested += ViewModel_MatchHistoryRequested;
+            viewModel.MatchViewerRequested += ViewModel_MatchViewerRequested;
+        }
+
+        private void ViewModel_MatchViewerRequested(object? sender, EventArgs e)
+        {
+            var matchViewer = new MatchViewerForm(new MatchViewerViewModel())
+            {
+                Owner = this
+            };
+
+            _ = matchViewer.ShowDialog();
         }
 
         private MainWindowViewModel ViewModel => (MainWindowViewModel)DataContext;
@@ -36,8 +47,18 @@ namespace FMSimTools.Views
                 Owner = this
             };
 
-            setup.SimulationCompleted += Setup_SimulationCompleted;
+            setup.LiveSimulationRequested += Setup_LiveSimulationRequested;
             _ = setup.ShowDialog();
+        }
+
+        private void Setup_LiveSimulationRequested(object? sender, LiveSimulationRequest request)
+        {
+            var viewer = new MatchViewerForm(new MatchViewerViewModel(request))
+            {
+                Owner = this
+            };
+
+            _ = viewer.ShowDialog();
         }
 
         private void ViewModel_MatchHistoryRequested(object? sender, EventArgs e)

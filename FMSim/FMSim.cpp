@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <ctime>
-#include <cstdlib>
 #include <exception>
 #include <fstream>
 #include <iomanip>
@@ -30,140 +28,151 @@ namespace {
     };
 
     std::vector<Player> createPlayers(const std::string& prefix, int baseAttack, int baseDefense, int baseGoalkeeping) {
+        using enum Position;
         return
         {
-            Player(prefix + " GK", Position::Goalkeeper, Attributes(12, 8, 10, 72, 50, 15, 10, 8, 55, baseGoalkeeping, baseGoalkeeping)),
-            Player(prefix + " RB", Position::Defender, Attributes(baseDefense, 45, 66, 78, 58, 68, 42, 30, 64, 58, 62)),
-            Player(prefix + " CB1", Position::Defender, Attributes(baseDefense + 4, 35, 54, 76, 52, 74, 30, 28, 74, 72, 68)),
-            Player(prefix + " CB2", Position::Defender, Attributes(baseDefense + 2, 36, 52, 75, 50, 72, 28, 28, 76, 74, 66)),
-            Player(prefix + " LB", Position::Defender, Attributes(baseDefense - 1, 48, 67, 78, 60, 66, 44, 32, 64, 60, 63)),
-            Player(prefix + " DM", Position::Midfielder, Attributes(62, 58, 60, 82, 68, 64, 55, 44, 68, 62, 64)),
-            Player(prefix + " CM1", Position::Midfielder, Attributes(58, 66, 64, 84, 74, 58, 64, 56, 66, 60, 65)),
-            Player(prefix + " CM2", Position::Midfielder, Attributes(56, 68, 65, 83, 76, 54, 66, 58, 64, 58, 66)),
-            Player(prefix + " RW", Position::Attacker, Attributes(34, baseAttack, 78, 79, 68, 32, 74, 66, 60, 58, 63)),
-            Player(prefix + " ST", Position::Attacker, Attributes(30, baseAttack + 4, 74, 77, 60, 28, 72, 74, 72, 68, 64)),
-            Player(prefix + " LW", Position::Attacker, Attributes(34, baseAttack - 1, 79, 79, 69, 30, 75, 67, 59, 57, 63))
+            Player(prefix + " GK", Goalkeeper, Attributes(12, 8, 10, 72, 50, 15, 10, 8, 55, baseGoalkeeping, baseGoalkeeping)),
+            Player(prefix + " RB", Defender, Attributes(baseDefense, 45, 66, 78, 58, 68, 42, 30, 64, 58, 62)),
+            Player(prefix + " CB1", Defender, Attributes(baseDefense + 4, 35, 54, 76, 52, 74, 30, 28, 74, 72, 68)),
+            Player(prefix + " CB2", Defender, Attributes(baseDefense + 2, 36, 52, 75, 50, 72, 28, 28, 76, 74, 66)),
+            Player(prefix + " LB", Defender, Attributes(baseDefense - 1, 48, 67, 78, 60, 66, 44, 32, 64, 60, 63)),
+            Player(prefix + " DM", Midfielder, Attributes(62, 58, 60, 82, 68, 64, 55, 44, 68, 62, 64)),
+            Player(prefix + " CM1", Midfielder, Attributes(58, 66, 64, 84, 74, 58, 64, 56, 66, 60, 65)),
+            Player(prefix + " CM2", Midfielder, Attributes(56, 68, 65, 83, 76, 54, 66, 58, 64, 58, 66)),
+            Player(prefix + " RW", Attacker, Attributes(34, baseAttack, 78, 79, 68, 32, 74, 66, 60, 58, 63)),
+            Player(prefix + " ST", Attacker, Attributes(30, baseAttack + 4, 74, 77, 60, 28, 72, 74, 72, 68, 64)),
+            Player(prefix + " LW", Attacker, Attributes(34, baseAttack - 1, 79, 79, 69, 30, 75, 67, 59, 57, 63))
         };
     }
 
     std::string tacticToString(TacticType tacticType) {
         switch (tacticType) {
-        case TacticType::Possession: return "Possession";
-        case TacticType::WingPlay: return "Wing Play";
-        case TacticType::LongBall: return "Long Ball";
-        case TacticType::TikiTaka: return "Tiki Taka";
-        case TacticType::CounterAttack: return "Counter Attack";
+            using enum TacticType;
+        case Possession: return "Possession";
+        case WingPlay: return "Wing Play";
+        case LongBall: return "Long Ball";
+        case TikiTaka: return "Tiki Taka";
+        case CounterAttack: return "Counter Attack";
         default: return "Unknown";
         }
     }
 
     std::string defenseTacticToString(DefenseTacticType tacticType) {
         switch (tacticType) {
-        case DefenseTacticType::Pressing: return "Pressing";
-        case DefenseTacticType::ManMarking: return "Man Marking";
-        case DefenseTacticType::ZonalMarking: return "Zonal Marking";
-        case DefenseTacticType::CounterPressing: return "Counter Pressing";
+            using enum DefenseTacticType;
+        case Pressing: return "Pressing";
+        case ManMarking: return "Man Marking";
+        case ZonalMarking: return "Zonal Marking";
+        case CounterPressing: return "Counter Pressing";
         default: return "Unknown";
         }
     }
 
     std::string zoneToString(Zone zone) {
         switch (zone) {
-        case Zone::H1: return "H1";
-        case Zone::H2: return "H2";
-        case Zone::H3: return "H3";
-        case Zone::M1: return "M1";
-        case Zone::M2: return "M2";
-        case Zone::M3: return "M3";
-        case Zone::A1: return "A1";
-        case Zone::A2: return "A2";
-        case Zone::A3: return "A3";
+            using enum Zone;
+        case H1: return "H1";
+        case H2: return "H2";
+        case H3: return "H3";
+        case M1: return "M1";
+        case M2: return "M2";
+        case M3: return "M3";
+        case A1: return "A1";
+        case A2: return "A2";
+        case A3: return "A3";
         default: return "Unknown";
         }
     }
 
     std::string attackEventToString(AttackEvent attackEvent) {
         switch (attackEvent) {
-        case AttackEvent::ShortPass: return "Short Pass";
-        case AttackEvent::LongPass: return "Long Pass";
-        case AttackEvent::ThroughBall: return "Through Ball";
-        case AttackEvent::Dribble: return "Dribble";
-        case AttackEvent::Shoot: return "Shoot";
-        case AttackEvent::Cross: return "Cross";
-        case AttackEvent::Clearance: return "Clearance";
+            using enum AttackEvent;
+        case ShortPass: return "Short Pass";
+        case LongPass: return "Long Pass";
+        case ThroughBall: return "Through Ball";
+        case Dribble: return "Dribble";
+        case Shoot: return "Shoot";
+        case Cross: return "Cross";
+        case Clearance: return "Clearance";
         default: return "Attack";
         }
     }
 
     std::string defenseEventToString(DefenseEvent defenseEvent) {
         switch (defenseEvent) {
-        case DefenseEvent::Tackle: return "Tackle";
-        case DefenseEvent::Interception: return "Interception";
-        case DefenseEvent::Block: return "Block";
-        case DefenseEvent::HeadingClearance: return "Heading Clearance";
-        case DefenseEvent::SlidingTackle: return "Sliding Tackle";
-        case DefenseEvent::Pressure: return "Pressure";
-        case DefenseEvent::ForwardPress: return "Forward Press";
-        case DefenseEvent::GoalkeeperSave: return "Goalkeeper Save";
-        case DefenseEvent::GoalkeeperPunch: return "Goalkeeper Punch";
-        case DefenseEvent::GoalkeeperCatch: return "Goalkeeper Catch";
-        case DefenseEvent::Clearance: return "Clearance";
-        case DefenseEvent::Idle: return "Idle";
+            using enum DefenseEvent;
+        case Tackle: return "Tackle";
+        case Interception: return "Interception";
+        case Block: return "Block";
+        case HeadingClearance: return "Heading Clearance";
+        case SlidingTackle: return "Sliding Tackle";
+        case Pressure: return "Pressure";
+        case ForwardPress: return "Forward Press";
+        case GoalkeeperSave: return "Goalkeeper Save";
+        case GoalkeeperPunch: return "Goalkeeper Punch";
+        case GoalkeeperCatch: return "Goalkeeper Catch";
+        case Clearance: return "Clearance";
+        case Idle: return "Idle";
         default: return "Defense";
         }
     }
 
     std::string outcomeToString(EventOutcome eventOutcome) {
         switch (eventOutcome) {
-        case EventOutcome::Success: return "Success";
-        case EventOutcome::Fail: return "Fail";
-        case EventOutcome::Goal: return "Goal";
-        case EventOutcome::Saved: return "Saved";
-        case EventOutcome::Blocked: return "Blocked";
-        case EventOutcome::Cleared: return "Cleared";
-        case EventOutcome::Out: return "Out";
-        case EventOutcome::ThrownIn: return "Thrown In";
-        case EventOutcome::CornerKick: return "Corner";
-        case EventOutcome::GoalKeeperHeld: return "Held";
-        case EventOutcome::Rebound: return "Rebound";
-        case EventOutcome::Fouled: return "Fouled";
+            using enum EventOutcome;
+        case Success: return "Success";
+        case Fail: return "Fail";
+        case Goal: return "Goal";
+        case Saved: return "Saved";
+        case Blocked: return "Blocked";
+        case Cleared: return "Cleared";
+        case Out: return "Out";
+        case ThrownIn: return "Thrown In";
+        case CornerKick: return "Corner";
+        case GoalKeeperHeld: return "Held";
+        case Rebound: return "Rebound";
+        case Fouled: return "Fouled";
         default: return "Outcome";
         }
     }
 
     std::string otherEventToString(OtherEvent otherEvent) {
         switch (otherEvent) {
-        case OtherEvent::Kickoff: return "Kickoff";
-        case OtherEvent::HalfTime: return "Half Time";
-        case OtherEvent::FullTime: return "Full Time";
-        case OtherEvent::Rebound: return "Rebound";
-        case OtherEvent::OwnGoal: return "Own Goal";
-        case OtherEvent::Offside: return "Offside";
-        case OtherEvent::Foul: return "Foul";
-        case OtherEvent::Injury: return "Injury";
-        case OtherEvent::OutOfPlay: return "Out Of Play";
-        case OtherEvent::ThrowIn: return "Throw In";
-        case OtherEvent::CornerKick: return "Corner Kick";
+            using enum OtherEvent;
+        case Kickoff: return "Kickoff";
+        case HalfTime: return "Half Time";
+        case FullTime: return "Full Time";
+        case Rebound: return "Rebound";
+        case OwnGoal: return "Own Goal";
+        case Offside: return "Offside";
+        case Foul: return "Foul";
+        case Injury: return "Injury";
+        case OutOfPlay: return "Out Of Play";
+        case ThrowIn: return "Throw In";
+        case CornerKick: return "Corner Kick";
         default: return "Other Event";
         }
     }
 
     std::string teamNameForEvent(PossessionState possessionState, const MatchEngine& engine) {
         switch (possessionState) {
-        case PossessionState::Home: return engine.getHomeTeamName();
-        case PossessionState::Away: return engine.getAwayTeamName();
-        case PossessionState::None:
+            using enum PossessionState;
+        case Home: return engine.getHomeTeamName();
+        case Away: return engine.getAwayTeamName();
+        case None:
         default: return "None";
         }
     }
 
     std::string eventTimestamp(int elapsedSeconds) {
-        std::ostringstream stream;
+        std::string timeStamp;
+
         const int minutes = elapsedSeconds / 60;
         const int seconds = elapsedSeconds % 60;
-        stream << "[" << std::setw(2) << std::setfill('0') << minutes
-            << ":" << std::setw(2) << std::setfill('0') << seconds << "]";
-        return stream.str();
+
+        timeStamp = std::format("{:02}:{:02}", minutes, seconds);
+
+        return timeStamp;
     }
 
     std::string detailedEventLine(const EventStruct& eventStruct, const MatchEngine& engine) {
@@ -187,8 +196,8 @@ namespace {
         int homeScore = 0;
         int awayScore = 0;
 
-        for (std::size_t index = 0; index <= eventIndex && index < engine.events.size(); ++index) {
-            const EventStruct& currentEvent = engine.events[index];
+        for (std::size_t index = 0; index <= eventIndex && index < engine.getEvents().size(); ++index) {
+            const EventStruct& currentEvent = engine.getEvents()[index];
             if (!currentEvent.isOtherEvent || currentEvent.eventOutcome != EventOutcome::Goal) {
                 continue;
             }
@@ -209,24 +218,26 @@ namespace {
 
     std::string possessionShortName(PossessionState possessionState) {
         switch (possessionState) {
-        case PossessionState::Home: return "H";
-        case PossessionState::Away: return "A";
-        case PossessionState::None:
+            using enum PossessionState;
+        case Home: return "H";
+        case Away: return "A";
+        case None:
         default: return "-";
         }
     }
 
     std::pair<int, int> zoneToGridPosition(Zone zone) {
         switch (zone) {
-        case Zone::H1: return { 0, 0 };
-        case Zone::H2: return { 0, 1 };
-        case Zone::H3: return { 0, 2 };
-        case Zone::M1: return { 1, 0 };
-        case Zone::M2: return { 1, 1 };
-        case Zone::M3: return { 1, 2 };
-        case Zone::A1: return { 2, 0 };
-        case Zone::A2: return { 2, 1 };
-        case Zone::A3: return { 2, 2 };
+            using enum Zone;
+        case H1: return { 0, 0 };
+        case H2: return { 0, 1 };
+        case H3: return { 0, 2 };
+        case M1: return { 1, 0 };
+        case M2: return { 1, 1 };
+        case M3: return { 1, 2 };
+        case A1: return { 2, 0 };
+        case A2: return { 2, 1 };
+        case A3: return { 2, 2 };
         default: return { 1, 1 };
         }
     }
@@ -271,7 +282,7 @@ namespace {
     }
 
     void replayMatchInConsole(const MatchEngine& engine, const std::vector<std::string>& commentaryLines) {
-        if (engine.events.empty()) {
+        if (engine.getEvents().empty()) {
             return;
         }
 
@@ -281,14 +292,14 @@ namespace {
         std::getline(std::cin, discard);
 
         const std::size_t commentaryOffset = 5;
-        for (std::size_t index = 0; index < engine.events.size(); ++index) {
+        for (std::size_t index = 0; index < engine.getEvents().size(); ++index) {
             std::string commentaryLine = "Anlatim bulunamadi.";
-            const std::size_t commentaryIndex = commentaryOffset + index;
-            if (commentaryIndex < commentaryLines.size()) {
+
+            if (const std::size_t commentaryIndex = commentaryOffset + index; commentaryIndex < commentaryLines.size()) {
                 commentaryLine = commentaryLines[commentaryIndex];
             }
 
-            printZoneReplayFrame(engine.events[index], engine, index, commentaryLine);
+            printZoneReplayFrame(engine.getEvents()[index], engine, index, commentaryLine);
         }
     }
 
@@ -298,14 +309,15 @@ namespace {
         const TacticType attackTactic = isHomeTeam ? engine.getHomeTacticType() : engine.getAwayTacticType();
         const DefenseTacticType defenseTactic = isHomeTeam ? engine.getHomeDefenseTacticType() : engine.getAwayDefenseTacticType();
 
-        std::ostringstream stream;
-        stream << teamName
-            << " | hucum taktik: " << tacticToString(attackTactic)
-            << " | savunma taktik: " << defenseTacticToString(defenseTactic)
-            << " | guc A:" << std::fixed << std::setprecision(1) << strength.getAttack()
-            << " D:" << strength.getDefense()
-            << " G:" << strength.getGoalkeeping();
-        return stream.str();
+        std::string summary = std::format("{} | attack tactic: {} | defense tactic: {} | power A:{:.1f} D:{:.1f} G:{:.1f}",
+            teamName,
+            tacticToString(attackTactic),
+            defenseTacticToString(defenseTactic),
+            strength.getAttack(),
+            strength.getDefense(),
+            strength.getGoalkeeping());
+
+        return summary;
     }
 
     std::filesystem::path buildUniqueOutputPath(
@@ -320,7 +332,7 @@ namespace {
         }
 
         for (int index = 1; ; ++index) {
-            candidate = directory / (stem + "(" + std::to_string(index) + ")" + extension);
+            candidate = directory / std::format("{}({}){}", stem, index, extension);
             if (!std::filesystem::exists(candidate)) {
                 return candidate;
             }
@@ -357,41 +369,86 @@ namespace {
     }
 
     int promptSimulationCount() {
-        std::cout << "Kac mac simule edilsin? ";
+        constexpr int defaultSimulationCount = 1;
+        constexpr int warningSimulationCount = 1000;
+        constexpr int maxSimulationCount = 10000;
+
+        std::cout << "How many matches should be simulated? ";
+
         std::string input;
         std::getline(std::cin, input);
 
         try {
-            const int parsedValue = std::stoi(input);
-            return parsedValue > 0 ? parsedValue : 1;
+            std::size_t pos = 0;
+            int parsedValue = std::stoi(input, &pos);
+
+            if (pos != input.size()) {
+                return defaultSimulationCount;
+            }
+
+            if (parsedValue <= 0) {
+                return defaultSimulationCount;
+            }
+
+            if (parsedValue > maxSimulationCount) {
+                std::cout << "A maximum of " << maxSimulationCount
+                    << " matches can be simulated. Using "
+                    << maxSimulationCount << ".\n";
+
+                return maxSimulationCount;
+            }
+
+            if (parsedValue > warningSimulationCount) {
+                std::cout << "Warning: Simulating more than "
+                    << warningSimulationCount
+                    << " matches may take a long time.\n";
+
+                std::cout << "Do you want to continue? (y/n): ";
+
+                std::string confirm;
+                std::getline(std::cin, confirm);
+
+                if (confirm.empty() || (confirm[0] != 'y' && confirm[0] != 'Y')) {
+                    std::cout << "Operation cancelled. Using default value "
+                        << defaultSimulationCount << ".\n";
+
+                    return defaultSimulationCount;
+                }
+            }
+
+            return parsedValue;
         }
-        catch (...) {
-            return 1;
+        catch (const std::invalid_argument&) {
+            return defaultSimulationCount;
+        }
+        catch (const std::out_of_range&) {
+            std::cout << "The entered value is too large. Using maximum value "
+                << maxSimulationCount << ".\n";
+
+            return maxSimulationCount;
         }
     }
 
     std::optional<std::string> readEnvironmentVariable(const char* variableName) {
-        char* value = nullptr;
-        std::size_t length = 0;
-        if (_dupenv_s(&value, &length, variableName) != 0 || value == nullptr || length == 0) {
+        char* rawValue = nullptr;
+
+        if (std::size_t length = 0; _dupenv_s(&rawValue, &length, variableName) != 0 || rawValue == nullptr || length == 0) {
             return std::nullopt;
         }
 
-        const std::string result(value);
-        free(value);
-        return result;
+        std::unique_ptr<char, decltype(&free)> value(rawValue, &free);
+        return std::string(value.get());
     }
 
     std::optional<std::filesystem::path> readEnvironmentPathVariable(const wchar_t* variableName) {
-        wchar_t* value = nullptr;
-        std::size_t length = 0;
-        if (_wdupenv_s(&value, &length, variableName) != 0 || value == nullptr || length == 0) {
+        wchar_t* rawValue = nullptr;
+
+        if (std::size_t length = 0; _wdupenv_s(&rawValue, &length, variableName) != 0 || rawValue == nullptr || length == 0) {
             return std::nullopt;
         }
 
-        const std::filesystem::path result(value);
-        free(value);
-        return result;
+        std::unique_ptr<wchar_t, decltype(&free)> value(rawValue, &free);
+        return std::filesystem::path(value.get());
     }
 
     bool isNonInteractive();
@@ -419,20 +476,18 @@ namespace {
         OPENFILENAMEA f = { 0 };
         f.lStructSize = sizeof(OPENFILENAMEA);
 
-        char buff[_MAX_PATH]{};
-        char initialDirectory[_MAX_PATH]{};
+        std::string selectedFile(MAX_PATH, '\0');
         const std::filesystem::path teamsDirectory = std::filesystem::current_path() / "Teams";
-        const std::string initialDirectoryText = teamsDirectory.string();
-        strncpy_s(initialDirectory, initialDirectoryText.c_str(), _TRUNCATE);
+        const std::string initialDirectory = teamsDirectory.string();
 
         f.lpstrFilter = "JSON Files\0*.json\0All Files\0*.*\0";
         f.lpstrTitle = title;
-        f.lpstrInitialDir = initialDirectory;
-        f.nMaxFile = sizeof(buff);
-        f.lpstrFile = buff;
+        f.lpstrInitialDir = initialDirectory.c_str();
+        f.nMaxFile = static_cast<DWORD>(selectedFile.size());
+        f.lpstrFile = selectedFile.data();
 
         if (GetOpenFileNameA(&f) == TRUE) {
-            return std::filesystem::path(buff);
+            return std::filesystem::path(selectedFile.c_str());
         }
 
         return std::nullopt;
@@ -443,9 +498,59 @@ namespace {
         return skipReplay.has_value() && skipReplay.value() == "1";
     }
 
+    bool shouldUseLiveEvents() {
+        const std::optional<std::string> liveEvents = readEnvironmentVariable("FMSIM_LIVE_EVENTS");
+        return liveEvents.has_value() && liveEvents.value() == "1";
+    }
+
     bool isNonInteractive() {
         const std::optional<std::string> nonInteractive = readEnvironmentVariable("FMSIM_NON_INTERACTIVE");
         return nonInteractive.has_value() && nonInteractive.value() == "1";
+    }
+
+    std::string jsonEscape(const std::string& value) {
+        std::ostringstream stream;
+        for (const char ch : value) {
+            switch (ch) {
+            case '\\': stream << R"(\\)"; break;
+            case '"': stream << R"(\")"; break;
+            case '\n': stream << "\\n"; break;
+            case '\r': stream << "\\r"; break;
+            case '\t': stream << "\\t"; break;
+            default: stream << ch; break;
+            }
+        }
+        return stream.str();
+    }
+
+    std::string latestCommentaryLine(const MatchEngine& engine, const Commentator& commentator) {
+        const std::vector<std::string> commentaryLines = commentator.BuildCommentary(engine);
+        return commentaryLines.empty() ? std::string() : commentaryLines.back();
+    }
+
+    void writeLiveEventLine(const MatchEngine& engine, const Commentator& commentator) {
+        if (engine.getEvents().empty()) {
+            return;
+        }
+
+        const EventStruct& eventStruct = engine.getEvents().back();
+        std::cout << "FMSIM_EVENT {"
+            << R"("time":")" << jsonEscape(eventTimestamp(eventStruct.elapsedSeconds)) << "\","
+            << R"("homeTeam":")" << jsonEscape(engine.getHomeTeamName()) << "\","
+            << R"("awayTeam":")" << jsonEscape(engine.getAwayTeamName()) << "\","
+            << R"("team":")" << jsonEscape(teamNameForEvent(eventStruct.possessionState, engine)) << "\","
+            << R"("fromZone":")" << jsonEscape(zoneToString(eventStruct.fromZone)) << "\","
+            << R"("toZone":")" << jsonEscape(zoneToString(eventStruct.toZone)) << "\","
+            << R"("homeScore":)" << engine.getHomeScore() << ","
+            << R"("awayScore":)" << engine.getAwayScore() << ","
+            << R"("isFullTime":)" << (eventStruct.isOtherEvent && eventStruct.otherEvent == OtherEvent::FullTime ? "true" : "false") << ","
+            << R"("commentary":")" << jsonEscape(latestCommentaryLine(engine, commentator)) << "\""
+            << "}" << std::endl;
+    }
+
+    void waitForLiveNextCommand() {
+        std::string command;
+        std::getline(std::cin, command);
     }
 }
 
@@ -470,7 +575,6 @@ int main() {
     const std::filesystem::path summaryPath = buildSummaryOutputPath(logsDirectory, suffix);
 
     try {
-        std::srand(static_cast<unsigned int>(std::time(nullptr)));
         std::vector<MatchResultSummary> matchResults;
         matchResults.reserve(simulationCount);
         std::string homeTeamName;
@@ -496,13 +600,32 @@ int main() {
 
             MatchEngine engine(homeTeam, awayTeam, true, simulationMinutes);
             debugFile << "engine created" << std::endl;
-            engine.simulateStart();
+            Commentator commentator(homeTeam.getName(), awayTeam.getName());
+
+            if (shouldUseLiveEvents()) {
+                engine.simulateStart();
+                writeLiveEventLine(engine, commentator);
+                waitForLiveNextCommand();
+
+                while (true) {
+                    const bool hasMoreEvents = engine.simulateNextEvent();
+                    writeLiveEventLine(engine, commentator);
+                    if (!hasMoreEvents) {
+                        break;
+                    }
+                    waitForLiveNextCommand();
+                }
+            }
+            else {
+                engine.simulateFullMatch();
+            }
+
             debugFile << "simulation finished" << std::endl;
             debugFile << "event logs count: " << engine.getEventLogs().size() << std::endl;
             debugFile << "score: " << engine.getHomeScore() << "-" << engine.getAwayScore() << std::endl;
             debugFile << teamSummaryLine(engine, true) << std::endl;
             debugFile << teamSummaryLine(engine, false) << std::endl;
-            for (const auto& eventStruct : engine.events) {
+            for (const auto& eventStruct : engine.getEvents()) {
                 debugFile << "log: " << detailedEventLine(eventStruct, engine) << std::endl;
             }
 
@@ -512,11 +635,10 @@ int main() {
             eventFile << teamSummaryLine(engine, true) << std::endl;
             eventFile << teamSummaryLine(engine, false) << std::endl << std::endl;
 
-            for (const auto& eventStruct : engine.events) {
+            for (const auto& eventStruct : engine.getEvents()) {
                 eventFile << detailedEventLine(eventStruct, engine) << std::endl;
             }
 
-            Commentator commentator(homeTeam.getName(), awayTeam.getName());
             const std::vector<std::string> commentaryLines = commentator.BuildCommentary(engine);
             commentator.SaveCommentary(engine, outputPaths.commentaryPath.string());
             debugFile << "commentator created from same match events" << std::endl;
@@ -531,7 +653,7 @@ int main() {
 
             if (simulationCount == 1 && !shouldSkipReplay()) {
                 std::cout << '\n';
-                for (const auto& eventStruct : engine.events) {
+                for (const auto& eventStruct : engine.getEvents()) {
                     std::cout << detailedEventLine(eventStruct, engine) << '\n';
                 }
                 replayMatchInConsole(engine, commentaryLines);

@@ -40,45 +40,25 @@ namespace FMSimTools.ViewModels
 
         public ObservableCollection<int> AvailableSimulationMinutes { get; } = [6, 12, 24];
 
-        public event EventHandler<SimulationResult>? SimulationCompleted;
-
-        public event EventHandler<string>? SimulationFailed;
+        public event EventHandler<LiveSimulationRequest>? LiveSimulationRequested;
 
         public event EventHandler? CloseRequested;
 
         [RelayCommand(CanExecute = nameof(CanStartSimulation))]
-        private async Task OnStartSimulationAsync()
+        private void OnStartSimulation()
         {
             if (SelectedHomeTeam is null || SelectedAwayTeam is null)
             {
                 return;
             }
 
-            try
-            {
-                IsRunning = true;
-                StatusMessage = "Simulation running...";
-                StartSimulationCommand.NotifyCanExecuteChanged();
-
-                var result = await SimulationRunner.RunAsync(
+            LiveSimulationRequested?.Invoke(
+                this,
+                new LiveSimulationRequest(
                     SelectedHomeTeam,
                     SelectedAwayTeam,
                     SelectedSimulationMinutes,
-                    SimulationCount);
-
-                StatusMessage = "Simulation completed.";
-                SimulationCompleted?.Invoke(this, result);
-            }
-            catch (Exception exception)
-            {
-                StatusMessage = $"Simulation failed: {exception.Message}";
-                SimulationFailed?.Invoke(this, StatusMessage);
-            }
-            finally
-            {
-                IsRunning = false;
-                StartSimulationCommand.NotifyCanExecuteChanged();
-            }
+                    SimulationCount));
         }
 
         [RelayCommand]

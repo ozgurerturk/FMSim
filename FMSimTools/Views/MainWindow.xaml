@@ -46,6 +46,10 @@
                        Width="140"
                        Margin="0 8 0 0"
                        Command="{Binding MatchHistoryCommand}" />
+            <ui:Button Content="Open Match Viewer"
+                       Width="140"
+                       Margin="0 8 0 0"
+                       Command="{Binding MatchViewerCommand}" />
             <ui:Button Content="Refresh"
                        Width="140"
                        Margin="0 8 0 0"

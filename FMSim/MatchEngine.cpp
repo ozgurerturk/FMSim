@@ -2,9 +2,22 @@
 #include "MatchEngine.h"
 #include "math.h"
 #include <cstdlib>
+#include <random>
+#include <algorithm>
 
-MatchEngine::MatchEngine() {
+namespace {
+    std::mt19937& randomGenerator() {
+        static thread_local std::mt19937 generator{ std::random_device{}() };
+        return generator;
+    }
+
+    double randomProbability() {
+        static thread_local std::uniform_real_distribution distribution(0.0, 1.0);
+        return distribution(randomGenerator());
+    }
 }
+
+MatchEngine::MatchEngine() = default;
 
 MatchEngine::MatchEngine(const Team& homeTeam, const Team& awayTeam, bool enableHomeAdvantage, int simulationTimeInMinutes)
     : _homeTeam(homeTeam),
@@ -26,36 +39,53 @@ void MatchEngine::simulateStart() {
     // Coin toss to decide which team kicks off
     bool doesHomeTeamKicksOff = coinToss();
     kickOff(doesHomeTeamKicksOff);
-    simulateNextEvent();
 }
 
-void MatchEngine::simulateNextEvent() {
+void MatchEngine::simulateFullMatch() {
+    simulateStart();
+
+    while (simulateNextEvent()) {
+        // Match loop
+    }
+}
+
+bool MatchEngine::simulateNextEvent() {
     // Main simulation logic here, the team who got the ball will
     // perform an action based on their tactics and its zone paths
-    // with randomly chosen (and wwill be weighted later) path and event from the tactic
+    // with randomly chosen (and will be weighted later) path and event from the tactic
     // Also defending team will have a chance to perform a defensive action based
     // on their tactics and the attacking event
 
     if (totalNormalAvailableEventsCounter.empty()) {
         // No more events can be simulated in this match, end the simulation
-        _eventLogs.push_back("Match simulation ended.");
-        events.push_back(EventStruct{ .isOtherEvent = true, .elapsedSeconds = _elapsedSimulationSeconds, .otherEvent = OtherEvent::FullTime });
-        return;
+        _eventLogs.emplace_back("Match simulation ended.");
+        EventStruct fullTimeEvent{};
+        fullTimeEvent.isOtherEvent = true;
+        fullTimeEvent.elapsedSeconds = _elapsedSimulationSeconds;
+        fullTimeEvent.otherEvent = OtherEvent::FullTime;
+        if (!_events.empty()) {
+            fullTimeEvent.possessionState = _events.back().possessionState;
+            fullTimeEvent.currentZone = _events.back().currentZone;
+            fullTimeEvent.fromZone = _events.back().currentZone;
+            fullTimeEvent.toZone = _events.back().currentZone;
+        }
+        _events.push_back(fullTimeEvent);
+        return false;
     }
 
     EventStruct nextEvent{};
     nextEvent.elapsedSeconds = _elapsedSimulationSeconds;
 
     // Current zone will be the same as the last event's zone
-    nextEvent.currentZone = events.back().currentZone;
-    nextEvent.fromZone = events.back().currentZone;
-    nextEvent.toZone = events.back().currentZone;
-    nextEvent.possessionState = events.back().possessionState;
+    nextEvent.currentZone = _events.back().currentZone;
+    nextEvent.fromZone = _events.back().currentZone;
+    nextEvent.toZone = _events.back().currentZone;
+    nextEvent.possessionState = _events.back().possessionState;
 
     AttackEvent nextAttackEvent{};
     DefenseEvent nextDefenceEvent{};
     Zone tacticZone = getTacticZone(nextEvent.currentZone, nextEvent.possessionState);
-    Zone tacticNextZone = tacticZone;
+    Zone tacticNextZone;
 
     if (nextEvent.possessionState == PossessionState::Home) {
         nextAttackEvent = _homeTeam.getCurrentTeamTactic().StartAttack(tacticZone);
@@ -85,7 +115,7 @@ void MatchEngine::simulateNextEvent() {
     nextEvent.eventOutcome = result;
     applyEventOutcome(nextEvent);
 
-    events.push_back(nextEvent);
+    _events.push_back(nextEvent);
     _eventLogs.push_back(
         actingTeam + " - " +
         toString(nextEvent.attackEvent) + " - " +
@@ -94,39 +124,37 @@ void MatchEngine::simulateNextEvent() {
     totalNormalAvailableEventsCounter.pop(); // Decrease the counter for available events in this interval
     _elapsedSimulationSeconds += 5;
 
-    simulateNextEvent(); // Simulate the next event after the current one is processed
+    return true;
 }
 
-void MatchEngine::determineGoalKeeperSave(EventOutcome& result) {
-    double r = static_cast<double>(rand()) / RAND_MAX;
+void MatchEngine::determineGoalKeeperSave(EventOutcome& result) const {
+    using enum EventOutcome;
+    std::uniform_int_distribution distribution(1, 10000);
 
-    double held = 0.5008;
-    double corner = 0.1883;
-    double rebound = 0.1287;
-    double reboundDefense = 0.1390;
-    double other = 0.0432;
+    const int roll = distribution(randomGenerator());
 
-    double total = held + corner + rebound + reboundDefense + other;
-
-    held /= total;
-    corner /= total;
-    rebound /= total;
-    reboundDefense /= total;
-    other /= total;
+    constexpr int heldThreshold = 5008;
+    constexpr int cornerThreshold = heldThreshold + 1883;
+    constexpr int reboundThreshold = cornerThreshold + 1287;
+    constexpr int reboundDefenseThreshold = reboundThreshold + 1390;
+    // Remaining 4.32% probability is added to cleared for now
 
     // Determine the outcome of the goalkeeper save based on the probabilities
 
-    if (r < held) {
-        result = EventOutcome::GoalKeeperHeld;
+    if (roll <= heldThreshold) {
+        result = GoalKeeperHeld;
     }
-    else if ((r -= held) < corner) {
-        result = EventOutcome::CornerKick;
+    else if (roll <= cornerThreshold) {
+        result = CornerKick;
     }
-    else if ((r -= corner) < rebound) {
-        result = EventOutcome::Rebound;
+    else if (roll <= reboundThreshold) {
+        result = Rebound;
     }
-    else if ((r -= rebound) < reboundDefense) {
-        result = EventOutcome::Cleared;
+    else if (roll <= reboundDefenseThreshold) {
+        result = Cleared;
+    }
+    else {
+        result = Cleared;
     }
 }
 
@@ -152,12 +180,12 @@ void MatchEngine::kickOff(bool doesHomeTeamKicksOff) {
     kickoffEvent.toZone = kickoffEvent.currentZone;
     kickoffEvent.otherEvent = OtherEvent::Kickoff;
     resetAttackState();
-    events.push_back(kickoffEvent);
+    _events.push_back(kickoffEvent);
 }
 
 bool MatchEngine::coinToss() {
-    int tossResult = rand() % 2;
-    if (tossResult == 0) {
+    std::bernoulli_distribution distribution(0.5);
+    if (distribution(randomGenerator())) {
         _eventLogs.push_back(_homeTeam.getName() + " wins the coin toss and will kick off.");
         return true; // Home team kicks off
     }
@@ -167,7 +195,7 @@ bool MatchEngine::coinToss() {
     }
 }
 
-EventOutcome MatchEngine::determineEventOutcome(PossessionState possessionState, AttackEvent attackEvent, DefenseEvent defenseEvent) {
+EventOutcome MatchEngine::determineEventOutcome(PossessionState possessionState, AttackEvent attackEvent, DefenseEvent defenseEvent) const {
     (void)defenseEvent;
 
     const TeamStrength& attackingTeamStrength =
@@ -185,7 +213,7 @@ EventOutcome MatchEngine::determineEventOutcome(PossessionState possessionState,
 
         // First determine if shoot will be intercepted or blocked by the defense
         double defenseSuccessChance = defenseStrength / (defenseStrength + attackerAttackStrength);
-        double randomValue = static_cast<double>(rand()) / RAND_MAX; // Random value between 0 and 1
+        double randomValue = randomProbability(); // Random value between 0 and 1
 
         if (randomValue < defenseSuccessChance) {
             return EventOutcome::Blocked; // Shot is blocked by the defense
@@ -194,7 +222,7 @@ EventOutcome MatchEngine::determineEventOutcome(PossessionState possessionState,
         // If the shot is not blocked, determine if it will be saved by the goalkeeper
 
         double goalkeepingSuccessChance = goalkeepingStrength / (goalkeepingStrength + attackerAttackStrength);
-        randomValue = static_cast<double>(rand()) / RAND_MAX; // Random value between 0 and 1
+        randomValue = randomProbability(); // Random value between 0 and 1
 
         if (randomValue < goalkeepingSuccessChance) {
             //Saved by the keeper but is it a corner kick or tipped by the keeper and goes out for a throw in or is it a clear save?
@@ -210,7 +238,7 @@ EventOutcome MatchEngine::determineEventOutcome(PossessionState possessionState,
     // For other attack events, we can determine success or failure based on the attack and defense strengths
 
     double attackSuccessChance = attackerAttackStrength / (attackerAttackStrength + defenseStrength);
-    double randomValue = static_cast<double>(rand()) / RAND_MAX; // Random value between 0 and 1
+    double randomValue = randomProbability(); // Random value between 0 and 1
 
     if (randomValue < attackSuccessChance) {
         return EventOutcome::Success; // Attack is successful
@@ -264,23 +292,28 @@ const std::vector<std::string>& MatchEngine::getEventLogs() const {
     return _eventLogs;
 }
 
+const std::vector<EventStruct>& MatchEngine::getEvents() const {
+    return _events;
+}
+
 Zone MatchEngine::mirrorZone(Zone zone) const {
     switch (zone) {
-    case Zone::H1:
-        return Zone::A1;
-    case Zone::H2:
-        return Zone::A2;
-    case Zone::H3:
-        return Zone::A3;
-    case Zone::A1:
-        return Zone::H1;
-    case Zone::A2:
-        return Zone::H2;
-    case Zone::A3:
-        return Zone::H3;
-    case Zone::M1:
-    case Zone::M2:
-    case Zone::M3:
+        using enum Zone;
+    case H1:
+        return A1;
+    case H2:
+        return A2;
+    case H3:
+        return A3;
+    case A1:
+        return H1;
+    case A2:
+        return H2;
+    case A3:
+        return H3;
+    case M1:
+    case M2:
+    case M3:
     default:
         return zone;
     }
@@ -296,34 +329,37 @@ Zone MatchEngine::getMatchZone(Zone tacticZone, PossessionState possessionState)
 
 void MatchEngine::applyEventOutcome(EventStruct& nextEvent) {
     switch (nextEvent.eventOutcome) {
-    case EventOutcome::Success:
-    case EventOutcome::Rebound:
-    case EventOutcome::CornerKick:
+        using enum PossessionState;
+        using enum EventOutcome;
+
+    case Success:
+    case Rebound:
+    case CornerKick:
         break;
-    case EventOutcome::Goal:
-        if (nextEvent.possessionState == PossessionState::Home) {
+    case Goal:
+        if (nextEvent.possessionState == Home) {
             _homeScore++;
-            nextEvent.possessionState = PossessionState::Away;
+            nextEvent.possessionState = Away;
             nextEvent.currentZone = Zone::A2;
         }
         else {
             _awayScore++;
-            nextEvent.possessionState = PossessionState::Home;
+            nextEvent.possessionState = Home;
             nextEvent.currentZone = Zone::H2;
         }
         resetAttackState();
         break;
-    case EventOutcome::Saved:
-    case EventOutcome::GoalKeeperHeld:
-    case EventOutcome::Fail:
-    case EventOutcome::Blocked:
-    case EventOutcome::Cleared:
-    case EventOutcome::Out:
-    case EventOutcome::ThrownIn:
-    case EventOutcome::Fouled:
+    case Saved:
+    case GoalKeeperHeld:
+    case Fail:
+    case Blocked:
+    case Cleared:
+    case Out:
+    case ThrownIn:
+    case Fouled:
     default:
         nextEvent.possessionState =
-            nextEvent.possessionState == PossessionState::Home ? PossessionState::Away : PossessionState::Home;
+            nextEvent.possessionState == Home ? Away : Home;
         resetAttackState();
         break;
     }
@@ -336,11 +372,12 @@ void MatchEngine::resetAttackState() {
 
 std::string MatchEngine::toString(PossessionState possessionState) const {
     switch (possessionState) {
-    case PossessionState::Home:
+        using enum PossessionState;
+    case Home:
         return _homeTeam.getName();
-    case PossessionState::Away:
+    case Away:
         return _awayTeam.getName();
-    case PossessionState::None:
+    case None:
     default:
         return "None";
     }
@@ -348,19 +385,20 @@ std::string MatchEngine::toString(PossessionState possessionState) const {
 
 std::string MatchEngine::toString(AttackEvent attackEvent) const {
     switch (attackEvent) {
-    case AttackEvent::ShortPass:
+        using enum AttackEvent;
+    case ShortPass:
         return "Short Pass";
-    case AttackEvent::LongPass:
+    case LongPass:
         return "Long Pass";
-    case AttackEvent::ThroughBall:
+    case ThroughBall:
         return "Through Ball";
-    case AttackEvent::Dribble:
+    case Dribble:
         return "Dribble";
-    case AttackEvent::Shoot:
+    case Shoot:
         return "Shoot";
-    case AttackEvent::Cross:
+    case Cross:
         return "Cross";
-    case AttackEvent::Clearance:
+    case Clearance:
         return "Clearance";
     default:
         return "Attack";
@@ -369,29 +407,30 @@ std::string MatchEngine::toString(AttackEvent attackEvent) const {
 
 std::string MatchEngine::toString(EventOutcome eventOutcome) const {
     switch (eventOutcome) {
-    case EventOutcome::Success:
+        using enum EventOutcome;
+    case Success:
         return "Success";
-    case EventOutcome::Fail:
+    case Fail:
         return "Fail";
-    case EventOutcome::Goal:
+    case Goal:
         return "Goal";
-    case EventOutcome::Saved:
+    case Saved:
         return "Saved";
-    case EventOutcome::Blocked:
+    case Blocked:
         return "Blocked";
-    case EventOutcome::Cleared:
+    case Cleared:
         return "Cleared";
-    case EventOutcome::CornerKick:
+    case CornerKick:
         return "Corner";
-    case EventOutcome::Rebound:
+    case Rebound:
         return "Rebound";
-    case EventOutcome::GoalKeeperHeld:
+    case GoalKeeperHeld:
         return "Held";
-    case EventOutcome::Out:
+    case Out:
         return "Out";
-    case EventOutcome::ThrownIn:
+    case ThrownIn:
         return "Throw In";
-    case EventOutcome::Fouled:
+    case Fouled:
         return "Foul";
     default:
         return "Outcome";

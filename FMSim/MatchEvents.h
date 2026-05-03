@@ -86,11 +86,9 @@ enum class PossessionState {
 // Represent an event that occurs during a match
 class MatchEvent {
 public:
-    MatchEvent(AttackEvent attackEvent);
-    MatchEvent(DefenseEvent defenseEvent);
-    MatchEvent(OtherEvent otherEvent);
-
-private:
+    explicit MatchEvent(AttackEvent attackEvent);
+    explicit MatchEvent(DefenseEvent defenseEvent);
+    explicit MatchEvent(OtherEvent otherEvent);
 };
 
 struct BallState {

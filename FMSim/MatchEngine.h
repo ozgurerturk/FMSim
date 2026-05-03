@@ -23,7 +23,8 @@ public:
     // constant declarations
     static inline constexpr double STARTING_STAMINA = 100;
     static inline constexpr double HOME_ADVANTAGE_BONUS = 1.1;
-    static inline constexpr double ZONE_ATTACK_WEIGHTS[9][9] = {
+    static inline const std::vector<std::vector<double>> ZONE_DEFENSE_WEIGHTS;
+    static inline const std::vector<std::vector<double>> ZONE_ATTACK_WGTHS = {
         { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 },
         { 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 },
         { 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1 },
@@ -32,13 +33,14 @@ public:
         { 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4 },
         { 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5 },
         { 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6 },
-        { 0.9 ,1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 }
+        { 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 }
     };
-    static const double ZONE_DEFENSE_WEIGHTS[9][9];
 
     MatchEngine();
     MatchEngine(const Team& homeTeam, const Team& awayTeam, bool enableHomeAdvantage = true, int simulationTimeInMinutes = 6);
     void simulateStart();
+    bool simulateNextEvent();
+    void simulateFullMatch();
     int getHomeScore() const;
     int getAwayScore() const;
     const std::string& getHomeTeamName() const;
@@ -50,7 +52,7 @@ public:
     DefenseTacticType getHomeDefenseTacticType() const;
     DefenseTacticType getAwayDefenseTacticType() const;
     const std::vector<std::string>& getEventLogs() const;
-    std::vector<EventStruct> events;
+    const std::vector<EventStruct>& getEvents() const;
 
 private:
     Team _homeTeam;
@@ -60,9 +62,9 @@ private:
     int _homeScore = 0;
     int _awayScore = 0;
     int _elapsedSimulationSeconds = 0;
+    std::vector<EventStruct> _events;
     std::vector<std::string> _eventLogs;
-    void simulateNextEvent();
-    void determineGoalKeeperSave(EventOutcome& result);
+    void determineGoalKeeperSave(EventOutcome& result) const;
     void kickOff(bool doesHomeTeamKicksOff);
     bool coinToss();
     Zone mirrorZone(Zone zone) const;
@@ -74,5 +76,5 @@ private:
     std::string toString(AttackEvent attackEvent) const;
     std::string toString(EventOutcome eventOutcome) const;
     std::queue<int> totalNormalAvailableEventsCounter;
-    EventOutcome determineEventOutcome(PossessionState possessionState, AttackEvent attackEvent, DefenseEvent defenseEvent);
+    EventOutcome determineEventOutcome(PossessionState possessionState, AttackEvent attackEvent, DefenseEvent defenseEvent) const;
 };
