@@ -61,17 +61,18 @@ TeamStrength Team::getTeamStrength() const {
     double goalkeeping = 0;
     for (const auto& player : _players) {
         switch (player.getPosition()) {
-        case Position::Attacker:
+            using enum Position;
+        case Attacker:
             attack += player.getAttributes().getAttack();
             break;
-        case Position::Defender:
+        case Defender:
             defense += player.getAttributes().getDefense();
             break;
-        case Position::Midfielder:
+        case Midfielder:
             attack += player.getAttributes().getAttack();
             defense += player.getAttributes().getDefense();
             break;
-        case Position::Goalkeeper:
+        case Goalkeeper:
             goalkeeping += player.getAttributes().getGoalKeeping();
             break;
         }

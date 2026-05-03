@@ -27,6 +27,23 @@ namespace {
         int awayScore = 0;
     };
 
+    struct SimulationOptions {
+        std::filesystem::path homeTeamPath;
+        std::filesystem::path awayTeamPath;
+        int simulationMinutes = 6;
+        int simulationCount = 1;
+        std::string suffix;
+        std::filesystem::path logsDirectory;
+        std::filesystem::path summaryPath;
+    };
+
+    struct MatchSeriesResult {
+        SimulationOptions options;
+        std::string homeTeamName;
+        std::string awayTeamName;
+        std::vector<MatchResultSummary> matchResults;
+    };
+
     std::vector<Player> createPlayers(const std::string& prefix, int baseAttack, int baseDefense, int baseGoalkeeping) {
         using enum Position;
         return
@@ -552,156 +569,231 @@ namespace {
         std::string command;
         std::getline(std::cin, command);
     }
-}
 
-int main() {
-    const std::optional<std::filesystem::path> homeTeamPath = selectTeamJsonFile("Choose Home Team JSON");
-    if (!homeTeamPath.has_value()) {
-        std::cerr << "Home team selection cancelled.\n";
-        return 1;
-    }
+    void runLiveSimulation(MatchEngine& engine, const Commentator& commentator) {
+        engine.simulateStart();
+        writeLiveEventLine(engine, commentator);
+        waitForLiveNextCommand();
 
-    const std::optional<std::filesystem::path> awayTeamPath = selectTeamJsonFile("Choose Away Team JSON");
-    if (!awayTeamPath.has_value()) {
-        std::cerr << "Away team selection cancelled.\n";
-        return 1;
-    }
-
-    const int simulationMinutes = promptSimulationMinutes();
-    const int simulationCount = promptSimulationCount();
-    const std::string suffix = std::to_string(simulationMinutes);
-    const std::filesystem::path logsDirectory = "Logs";
-    std::filesystem::create_directories(logsDirectory);
-    const std::filesystem::path summaryPath = buildSummaryOutputPath(logsDirectory, suffix);
-
-    try {
-        std::vector<MatchResultSummary> matchResults;
-        matchResults.reserve(simulationCount);
-        std::string homeTeamName;
-        std::string awayTeamName;
-
-        for (int matchIndex = 0; matchIndex < simulationCount; ++matchIndex) {
-            const MatchOutputPaths outputPaths = buildMatchOutputPaths(logsDirectory, suffix);
-            std::ofstream debugFile(outputPaths.debugPath, std::ios::trunc);
-            std::ofstream eventFile(outputPaths.eventPath, std::ios::trunc);
-            debugFile.setf(std::ios::unitbuf);
-            eventFile.setf(std::ios::unitbuf);
-
-            debugFile << "main started" << std::endl;
-            debugFile << "rng seeded" << std::endl;
-
-            Team homeTeam = loadTeamFromJsonFile(homeTeamPath.value());
-            Team awayTeam = loadTeamFromJsonFile(awayTeamPath.value());
-            if (homeTeamName.empty()) {
-                homeTeamName = homeTeam.getName();
-                awayTeamName = awayTeam.getName();
-            }
-            debugFile << "teams created" << std::endl;
-
-            MatchEngine engine(homeTeam, awayTeam, true, simulationMinutes);
-            debugFile << "engine created" << std::endl;
-            Commentator commentator(homeTeam.getName(), awayTeam.getName());
-
-            if (shouldUseLiveEvents()) {
-                engine.simulateStart();
-                writeLiveEventLine(engine, commentator);
-                waitForLiveNextCommand();
-
-                while (true) {
-                    const bool hasMoreEvents = engine.simulateNextEvent();
-                    writeLiveEventLine(engine, commentator);
-                    if (!hasMoreEvents) {
-                        break;
-                    }
-                    waitForLiveNextCommand();
-                }
-            }
-            else {
-                engine.simulateFullMatch();
-            }
-
-            debugFile << "simulation finished" << std::endl;
-            debugFile << "event logs count: " << engine.getEventLogs().size() << std::endl;
-            debugFile << "score: " << engine.getHomeScore() << "-" << engine.getAwayScore() << std::endl;
-            debugFile << teamSummaryLine(engine, true) << std::endl;
-            debugFile << teamSummaryLine(engine, false) << std::endl;
-            for (const auto& eventStruct : engine.getEvents()) {
-                debugFile << "log: " << detailedEventLine(eventStruct, engine) << std::endl;
-            }
-
-            eventFile << simulationMinutes << " dakikalik mac sonucu" << std::endl;
-            eventFile << homeTeam.getName() << " " << engine.getHomeScore()
-                << " - " << engine.getAwayScore() << " " << awayTeam.getName() << std::endl << std::endl;
-            eventFile << teamSummaryLine(engine, true) << std::endl;
-            eventFile << teamSummaryLine(engine, false) << std::endl << std::endl;
-
-            for (const auto& eventStruct : engine.getEvents()) {
-                eventFile << detailedEventLine(eventStruct, engine) << std::endl;
-            }
-
-            const std::vector<std::string> commentaryLines = commentator.BuildCommentary(engine);
-            commentator.SaveCommentary(engine, outputPaths.commentaryPath.string());
-            debugFile << "commentator created from same match events" << std::endl;
-            debugFile << "commentary saved to " << outputPaths.commentaryPath.string() << std::endl;
-            debugFile << "stdout write completed" << std::endl;
-
-            std::cout << "[" << (matchIndex + 1) << "/" << simulationCount << "] "
-                << homeTeam.getName() << " " << engine.getHomeScore()
-                << " - " << engine.getAwayScore() << " " << awayTeam.getName() << '\n';
-
-            matchResults.push_back(MatchResultSummary{ engine.getHomeScore(), engine.getAwayScore() });
-
-            if (simulationCount == 1 && !shouldSkipReplay()) {
-                std::cout << '\n';
-                for (const auto& eventStruct : engine.getEvents()) {
-                    std::cout << detailedEventLine(eventStruct, engine) << '\n';
-                }
-                replayMatchInConsole(engine, commentaryLines);
-            }
+        while (engine.simulateNextEvent()) {
+            writeLiveEventLine(engine, commentator);
+            waitForLiveNextCommand();
         }
 
-        std::ofstream summaryFile(summaryPath, std::ios::trunc);
+        writeLiveEventLine(engine, commentator);
+    }
+
+    std::optional<SimulationOptions> readSimulationOptions() {
+        const std::optional<std::filesystem::path> homeTeamPath = selectTeamJsonFile("Choose Home Team JSON");
+        if (!homeTeamPath.has_value()) {
+            std::cerr << "Home team selection cancelled.\n";
+            return std::nullopt;
+        }
+
+        const std::optional<std::filesystem::path> awayTeamPath = selectTeamJsonFile("Choose Away Team JSON");
+        if (!awayTeamPath.has_value()) {
+            std::cerr << "Away team selection cancelled.\n";
+            return std::nullopt;
+        }
+
+        const int simulationMinutes = promptSimulationMinutes();
+        const int simulationCount = promptSimulationCount();
+        const std::string suffix = std::to_string(simulationMinutes);
+        const std::filesystem::path logsDirectory = "Logs";
+        std::filesystem::create_directories(logsDirectory);
+
+        return SimulationOptions{
+            homeTeamPath.value(),
+            awayTeamPath.value(),
+            simulationMinutes,
+            simulationCount,
+            suffix,
+            logsDirectory,
+            buildSummaryOutputPath(logsDirectory, suffix)
+        };
+    }
+
+    void runSimulationMode(MatchEngine& engine, const Commentator& commentator) {
+        if (shouldUseLiveEvents()) {
+            runLiveSimulation(engine, commentator);
+            return;
+        }
+
+        engine.simulateFullMatch();
+    }
+
+    void writeDebugLog(std::ofstream& debugFile, const MatchEngine& engine) {
+        debugFile << "simulation finished" << std::endl;
+        debugFile << "event logs count: " << engine.getEventLogs().size() << std::endl;
+        debugFile << "score: " << engine.getHomeScore() << "-" << engine.getAwayScore() << std::endl;
+        debugFile << teamSummaryLine(engine, true) << std::endl;
+        debugFile << teamSummaryLine(engine, false) << std::endl;
+
+        for (const auto& eventStruct : engine.getEvents()) {
+            debugFile << "log: " << detailedEventLine(eventStruct, engine) << std::endl;
+        }
+    }
+
+    void writeEventLog(
+        std::ofstream& eventFile,
+        const MatchEngine& engine,
+        const Team& homeTeam,
+        const Team& awayTeam,
+        int simulationMinutes) {
+        eventFile << simulationMinutes << " dakikalik mac sonucu" << std::endl;
+        eventFile << homeTeam.getName() << " " << engine.getHomeScore()
+            << " - " << engine.getAwayScore() << " " << awayTeam.getName() << std::endl << std::endl;
+        eventFile << teamSummaryLine(engine, true) << std::endl;
+        eventFile << teamSummaryLine(engine, false) << std::endl << std::endl;
+
+        for (const auto& eventStruct : engine.getEvents()) {
+            eventFile << detailedEventLine(eventStruct, engine) << std::endl;
+        }
+    }
+
+    void printMatchResult(const MatchEngine& engine, int matchIndex, int simulationCount) {
+        std::cout << "[" << (matchIndex + 1) << "/" << simulationCount << "] "
+            << engine.getHomeTeamName() << " " << engine.getHomeScore()
+            << " - " << engine.getAwayScore() << " " << engine.getAwayTeamName() << '\n';
+    }
+
+    void printReplayIfNeeded(
+        const MatchEngine& engine,
+        const std::vector<std::string>& commentaryLines,
+        int simulationCount) {
+        if (simulationCount != 1 || shouldSkipReplay()) {
+            return;
+        }
+
+        std::cout << '\n';
+        for (const auto& eventStruct : engine.getEvents()) {
+            std::cout << detailedEventLine(eventStruct, engine) << '\n';
+        }
+
+        replayMatchInConsole(engine, commentaryLines);
+    }
+
+    MatchResultSummary runSingleMatch(
+        const SimulationOptions& options,
+        int matchIndex,
+        std::string& homeTeamName,
+        std::string& awayTeamName) {
+        const MatchOutputPaths outputPaths = buildMatchOutputPaths(options.logsDirectory, options.suffix);
+        std::ofstream debugFile(outputPaths.debugPath, std::ios::trunc);
+        std::ofstream eventFile(outputPaths.eventPath, std::ios::trunc);
+        debugFile.setf(std::ios::unitbuf);
+        eventFile.setf(std::ios::unitbuf);
+
+        debugFile << "main started" << std::endl;
+
+        Team homeTeam = loadTeamFromJsonFile(options.homeTeamPath);
+        Team awayTeam = loadTeamFromJsonFile(options.awayTeamPath);
+        if (homeTeamName.empty()) {
+            homeTeamName = homeTeam.getName();
+            awayTeamName = awayTeam.getName();
+        }
+        debugFile << "teams created" << std::endl;
+
+        MatchEngine engine(homeTeam, awayTeam, true, options.simulationMinutes);
+        debugFile << "engine created" << std::endl;
+        Commentator commentator(homeTeam.getName(), awayTeam.getName());
+
+        runSimulationMode(engine, commentator);
+        writeDebugLog(debugFile, engine);
+        writeEventLog(eventFile, engine, homeTeam, awayTeam, options.simulationMinutes);
+
+        const std::vector<std::string> commentaryLines = commentator.BuildCommentary(engine);
+        commentator.SaveCommentary(engine, outputPaths.commentaryPath.string());
+        debugFile << "commentator created from same match events" << std::endl;
+        debugFile << "commentary saved to " << outputPaths.commentaryPath.string() << std::endl;
+        debugFile << "stdout write completed" << std::endl;
+
+        printMatchResult(engine, matchIndex, options.simulationCount);
+        printReplayIfNeeded(engine, commentaryLines, options.simulationCount);
+
+        return MatchResultSummary{ engine.getHomeScore(), engine.getAwayScore() };
+    }
+
+    MatchSeriesResult runMatchSeries(const SimulationOptions& options) {
+        MatchSeriesResult result{ options };
+        result.matchResults.reserve(options.simulationCount);
+
+        for (int matchIndex = 0; matchIndex < options.simulationCount; ++matchIndex) {
+            result.matchResults.push_back(
+                runSingleMatch(options, matchIndex, result.homeTeamName, result.awayTeamName));
+        }
+
+        return result;
+    }
+
+    void updateSeriesStats(
+        const MatchResultSummary& result,
+        int& homeWins,
+        int& awayWins,
+        int& draws,
+        int& totalHomeGoals,
+        int& totalAwayGoals) {
+        totalHomeGoals += result.homeScore;
+        totalAwayGoals += result.awayScore;
+
+        if (result.homeScore > result.awayScore) {
+            homeWins++;
+            return;
+        }
+
+        if (result.homeScore < result.awayScore) {
+            awayWins++;
+            return;
+        }
+
+        draws++;
+    }
+
+    void writeSeriesSummary(const MatchSeriesResult& result) {
+        std::ofstream summaryFile(result.options.summaryPath, std::ios::trunc);
         int homeWins = 0;
         int awayWins = 0;
         int draws = 0;
         int totalHomeGoals = 0;
         int totalAwayGoals = 0;
 
-        summaryFile << simulationCount << " maclik " << simulationMinutes << " dakikalik seri ozeti" << std::endl;
-        summaryFile << "Takimlar: " << homeTeamName << " vs " << awayTeamName << std::endl << std::endl;
+        summaryFile << result.options.simulationCount << " maclik "
+            << result.options.simulationMinutes << " dakikalik seri ozeti" << std::endl;
+        summaryFile << "Takimlar: " << result.homeTeamName << " vs " << result.awayTeamName << std::endl << std::endl;
 
-        for (std::size_t index = 0; index < matchResults.size(); ++index) {
-            const MatchResultSummary& result = matchResults[index];
-            totalHomeGoals += result.homeScore;
-            totalAwayGoals += result.awayScore;
+        for (std::size_t index = 0; index < result.matchResults.size(); ++index) {
+            const MatchResultSummary& matchResult = result.matchResults[index];
+            updateSeriesStats(matchResult, homeWins, awayWins, draws, totalHomeGoals, totalAwayGoals);
 
-            if (result.homeScore > result.awayScore) {
-                homeWins++;
-            }
-            else if (result.homeScore < result.awayScore) {
-                awayWins++;
-            }
-            else {
-                draws++;
-            }
-
-            summaryFile << "[" << (index + 1) << "] " << homeTeamName << " "
-                << result.homeScore << " - " << result.awayScore
-                << " " << awayTeamName << std::endl;
+            summaryFile << "[" << (index + 1) << "] " << result.homeTeamName << " "
+                << matchResult.homeScore << " - " << matchResult.awayScore
+                << " " << result.awayTeamName << std::endl;
         }
 
         summaryFile << std::endl;
-        summaryFile << homeTeamName << " galibiyet: " << homeWins << std::endl;
-        summaryFile << awayTeamName << " galibiyet: " << awayWins << std::endl;
+        summaryFile << result.homeTeamName << " galibiyet: " << homeWins << std::endl;
+        summaryFile << result.awayTeamName << " galibiyet: " << awayWins << std::endl;
         summaryFile << "Beraberlik: " << draws << std::endl;
-        summaryFile << "Toplam gol | " << homeTeamName << ": " << totalHomeGoals
-            << " | " << awayTeamName << ": " << totalAwayGoals << std::endl;
-        summaryFile << "Mac basi gol | " << homeTeamName << ": " << std::fixed << std::setprecision(2)
-            << (simulationCount > 0 ? static_cast<double>(totalHomeGoals) / simulationCount : 0.0)
-            << " | " << awayTeamName << ": "
-            << (simulationCount > 0 ? static_cast<double>(totalAwayGoals) / simulationCount : 0.0) << std::endl;
+        summaryFile << "Toplam gol | " << result.homeTeamName << ": " << totalHomeGoals
+            << " | " << result.awayTeamName << ": " << totalAwayGoals << std::endl;
+        summaryFile << "Mac basi gol | " << result.homeTeamName << ": " << std::fixed << std::setprecision(2)
+            << (result.options.simulationCount > 0 ? static_cast<double>(totalHomeGoals) / result.options.simulationCount : 0.0)
+            << " | " << result.awayTeamName << ": "
+            << (result.options.simulationCount > 0 ? static_cast<double>(totalAwayGoals) / result.options.simulationCount : 0.0) << std::endl;
+    }
+}
 
-        std::cout << "Ozet dosyasi yazildi: " << summaryPath.string() << '\n';
+int main() {
+    try {
+        const std::optional<SimulationOptions> options = readSimulationOptions();
+        if (!options.has_value()) {
+            return 1;
+        }
+
+        const MatchSeriesResult result = runMatchSeries(options.value());
+        writeSeriesSummary(result);
+
+        std::cout << "Ozet dosyasi yazildi: " << result.options.summaryPath.string() << '\n';
 
         return 0;
     }

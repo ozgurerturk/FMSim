@@ -355,27 +355,30 @@ namespace {
     }
 
     Position parsePosition(const std::string& text) {
-        if (text == "Goalkeeper") return Position::Goalkeeper;
-        if (text == "Defender") return Position::Defender;
-        if (text == "Midfielder") return Position::Midfielder;
-        if (text == "Attacker") return Position::Attacker;
+        using enum Position;
+        if (text == "Goalkeeper") return Goalkeeper;
+        if (text == "Defender") return Defender;
+        if (text == "Midfielder") return Midfielder;
+        if (text == "Attacker") return Attacker;
         throw std::runtime_error("Unknown position: " + text);
     }
 
     TacticType parseAttackTactic(const std::string& text) {
-        if (text == "Possession") return TacticType::Possession;
-        if (text == "WingPlay") return TacticType::WingPlay;
-        if (text == "LongBall") return TacticType::LongBall;
-        if (text == "TikiTaka") return TacticType::TikiTaka;
-        if (text == "CounterAttack") return TacticType::CounterAttack;
+        using enum TacticType;
+        if (text == "Possession") return Possession;
+        if (text == "WingPlay") return WingPlay;
+        if (text == "LongBall") return LongBall;
+        if (text == "TikiTaka") return TikiTaka;
+        if (text == "CounterAttack") return CounterAttack;
         throw std::runtime_error("Unknown attack tactic: " + text);
     }
 
     DefenseTacticType parseDefenseTactic(const std::string& text) {
-        if (text == "Pressing") return DefenseTacticType::Pressing;
-        if (text == "ManMarking") return DefenseTacticType::ManMarking;
-        if (text == "ZonalMarking") return DefenseTacticType::ZonalMarking;
-        if (text == "CounterPressing") return DefenseTacticType::CounterPressing;
+        using enum DefenseTacticType;
+        if (text == "Pressing") return Pressing;
+        if (text == "ManMarking") return ManMarking;
+        if (text == "ZonalMarking") return ZonalMarking;
+        if (text == "CounterPressing") return CounterPressing;
         throw std::runtime_error("Unknown defense tactic: " + text);
     }
 
