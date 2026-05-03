@@ -18,9 +18,9 @@ static ZonePath ConvertZonesToPath(const std::vector<Zone>& zones) {
 
 Tactic TacticFactory::CreateWingPlay() {
     Tactic tactic;
-    tactic.tacticType = TacticType::WingPlay;
+    tactic.setTacticType(TacticType::WingPlay);
 
-    tactic.paths =
+    tactic.setPaths(
     {
         // H2 -> M2 -> M1 -> A1 -> A2
         ZonePath
@@ -161,16 +161,16 @@ Tactic TacticFactory::CreateWingPlay() {
                 ZoneStep{ Zone::A2, Zone::A2 }
             }
         }
-    };
+    });
 
     return tactic;
 }
 
 Tactic TacticFactory::CreateLongBall() {
     Tactic tactic;
-    tactic.tacticType = TacticType::LongBall;
+    tactic.setTacticType(TacticType::LongBall);
 
-    tactic.paths =
+    tactic.setPaths(
     {
         // H2 -> A2(L)
         ZonePath
@@ -217,16 +217,16 @@ Tactic TacticFactory::CreateLongBall() {
                 ZoneStep{ Zone::A2, Zone::A2 }
             }
         }
-    };
+    });
 
     return tactic;
 }
 
 Tactic TacticFactory::CreateTikiTaka() {
     Tactic tactic;
-    tactic.tacticType = TacticType::TikiTaka;
+    tactic.setTacticType(TacticType::TikiTaka);
 
-    tactic.paths =
+    tactic.setPaths(
     {
         // H2 -> M2 <=> A2
         ZonePath
@@ -282,16 +282,16 @@ Tactic TacticFactory::CreateTikiTaka() {
                 ZoneStep{ Zone::A2, Zone::A2 }
             }
         }
-    };
+    });
 
     return tactic;
 }
 
 Tactic TacticFactory::CreateCounterAttack() {
     Tactic tactic;
-    tactic.tacticType = TacticType::CounterAttack;
+    tactic.setTacticType(TacticType::CounterAttack);
 
-    tactic.paths =
+    tactic.setPaths(
     {
         // H2 -> M2 -> A2
         ZonePath
@@ -346,7 +346,7 @@ Tactic TacticFactory::CreateCounterAttack() {
                 ZoneStep{ Zone::A2, Zone::A2 }
             }
         }
-    };
+    });
 
     return tactic;
 }
@@ -354,7 +354,7 @@ Tactic TacticFactory::CreateCounterAttack() {
 // Default tactic is Possession Game because it's the most basic and versatile tactic that can be used in various situations.
 Tactic TacticFactory::CreatePossessionGame() {
     Tactic tactic;
-    tactic.tacticType = TacticType::Possession;
+    tactic.setTacticType(TacticType::Possession);
 
     ZoneGraph graph;
 
@@ -364,14 +364,14 @@ Tactic TacticFactory::CreatePossessionGame() {
     auto zoneSequence = PathFinder::FindPath(graph, startZone, targetZone);
     auto zonePath = ConvertZonesToPath(zoneSequence);
 
-    tactic.paths.push_back(zonePath);
+    tactic.addPath(zonePath);
 
     // Add ZoneStep{ Zone::A2, Zone::A2 } to the last step to indicate that the attack ends in the A2 zone.
     // This is necessary because the GetAttackEvent method in the Tactic class relies on the last step of the chosen path to determine the final zone of the attack.
     // Will now attempt to shoot or dribble in the A2 zone after reaching it, instead of just standing there without any action.
 
-    if (!tactic.paths.empty()) {
-        tactic.paths.back().steps.push_back(ZoneStep{ Zone::A2, Zone::A2 });
+    if (tactic.hasPaths()) {
+        tactic.addStepToLastPath(ZoneStep{ Zone::A2, Zone::A2 });
     }
 
     return tactic;
@@ -379,24 +379,24 @@ Tactic TacticFactory::CreatePossessionGame() {
 
 DefenseTactic TacticFactory::CreatePressing() {
     DefenseTactic tactic;
-    tactic.defenseTacticType = DefenseTacticType::Pressing;
+    tactic.setDefenseTacticType(DefenseTacticType::Pressing);
     return tactic;
 }
 
 DefenseTactic TacticFactory::CreateManMarking() {
     DefenseTactic tactic;
-    tactic.defenseTacticType = DefenseTacticType::ManMarking;
+    tactic.setDefenseTacticType(DefenseTacticType::ManMarking);
     return tactic;
 }
 
 DefenseTactic TacticFactory::CreateZonalMarking() {
     DefenseTactic tactic;
-    tactic.defenseTacticType = DefenseTacticType::ZonalMarking;
+    tactic.setDefenseTacticType(DefenseTacticType::ZonalMarking);
     return tactic;
 }
 
 DefenseTactic TacticFactory::CreateCounterPressing() {
     DefenseTactic tactic;
-    tactic.defenseTacticType = DefenseTacticType::CounterPressing;
+    tactic.setDefenseTacticType(DefenseTacticType::CounterPressing);
     return tactic;
 }

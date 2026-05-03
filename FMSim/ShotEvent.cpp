@@ -6,19 +6,20 @@ ShotEvent::ShotEvent(ShotType shotType)
 
 double ShotEvent::getEffortCoefficient() const {
     switch (shotType) {
-    case ShotType::Shoot:
+        using enum ShotType;
+    case Shoot:
         return 1.0;
-    case ShotType::FreeKickShot:
+    case FreeKickShot:
         return 0.4;
-    case ShotType::LobbedShot:
+    case LobbedShot:
         return 1.1;
-    case ShotType::PenaltyShot:
+    case PenaltyShot:
         return 0.3;
-    case ShotType::TapIn:
+    case TapIn:
         return 0.1;
-    case ShotType::Header:
+    case Header:
         return 1.2;
-    case ShotType::FreeKickHeader:
+    case FreeKickHeader:
         return 1.2;
     default:
         return 1.0;
@@ -27,19 +28,20 @@ double ShotEvent::getEffortCoefficient() const {
 
 std::string ShotEvent::getName() const {
     switch (shotType) {
-    case ShotType::Shoot:
+        using enum ShotType;
+    case Shoot:
         return "Shoot";
-    case ShotType::FreeKickShot:
+    case FreeKickShot:
         return "Free Kick Shot";
-    case ShotType::LobbedShot:
+    case LobbedShot:
         return "Lobbed Shot";
-    case ShotType::PenaltyShot:
+    case PenaltyShot:
         return "Penalty Shot";
-    case ShotType::TapIn:
+    case TapIn:
         return "Tap In";
-    case ShotType::Header:
+    case Header:
         return "Header";
-    case ShotType::FreeKickHeader:
+    case FreeKickHeader:
         return "Free Kick Header";
     default:
         return "Unknown Shot Event";

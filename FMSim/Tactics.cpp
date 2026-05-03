@@ -1,43 +1,78 @@
 #include "Tactics.h"
-#include <cstdlib>
 #include "TacticFactory.h"
 #include "PathFinder.h"
 #include "ZoneGraph.h"
 #include <ranges>
 #include <algorithm>
+#include <random>
+#include <utility>
+
+namespace {
+    std::mt19937& randomGenerator() {
+        static thread_local std::mt19937 generator{ std::random_device{}() };
+        return generator;
+    }
+}
 
 Tactic::Tactic()
-    : tacticType(TacticType::Possession), _tacticType(TacticType::Possession) {
+    : _tacticType(TacticType::Possession) {
 }
 
 Tactic::Tactic(TacticType type)
-    : tacticType(type), _tacticType(type) {
+    : _tacticType(type) {
     switch (type) {
-    case TacticType::WingPlay:
+        using enum TacticType;
+    case WingPlay:
         *this = TacticFactory::CreateWingPlay();
         break;
-    case TacticType::LongBall:
+    case LongBall:
         *this = TacticFactory::CreateLongBall();
         break;
-    case TacticType::TikiTaka:
+    case TikiTaka:
         *this = TacticFactory::CreateTikiTaka();
         break;
-    case TacticType::CounterAttack:
+    case CounterAttack:
         *this = TacticFactory::CreateCounterAttack();
         break;
-    case TacticType::Possession:
+    case Possession:
     default:
         *this = TacticFactory::CreatePossessionGame();
         break;
     }
 }
 
+TacticType Tactic::getTacticType() const {
+    return _tacticType;
+}
+
+void Tactic::setTacticType(TacticType type) {
+    _tacticType = type;
+}
+
+void Tactic::setPaths(std::vector<ZonePath> paths) {
+    _paths = std::move(paths);
+}
+
+void Tactic::addPath(const ZonePath& path) {
+    _paths.push_back(path);
+}
+
+bool Tactic::hasPaths() const {
+    return !_paths.empty();
+}
+
+void Tactic::addStepToLastPath(const ZoneStep& step) {
+    if (!_paths.empty()) {
+        _paths.back().steps.push_back(step);
+    }
+}
+
 ZonePath Tactic::GetRandomPath(Zone ballZone) const {
-    if (paths.empty())
+    if (_paths.empty())
         return ZonePath();
 
     std::vector<ZonePath> candidates;
-    for (const auto& path : paths) {
+    for (const auto& path : _paths) {
         auto st = std::find_if(path.steps.begin(), path.steps.end(), [&](const ZoneStep& step) {
             return step.from == ballZone;
             });
@@ -73,12 +108,12 @@ ZonePath Tactic::GetRandomPath(Zone ballZone) const {
         return fallbackPath;
     }
 
-    int idx = rand() % candidates.size();
-    return candidates[idx];
+    std::uniform_int_distribution<std::size_t> distribution(0, candidates.size() - 1);
+    return candidates[distribution(randomGenerator())];
 }
 
 AttackEvent Tactic::GetAttackEvent(Zone ballZone) const {
-    if (chosenPath.steps.empty()) {
+    if (_chosenPath.steps.empty()) {
         return AttackEvent::Clearance;
     }
 
@@ -86,9 +121,9 @@ AttackEvent Tactic::GetAttackEvent(Zone ballZone) const {
         return step.from == ballZone;
         };
 
-    auto st = std::find_if(chosenPath.steps.begin(), chosenPath.steps.end(), findZoneStep);
+    auto st = std::find_if(_chosenPath.steps.begin(), _chosenPath.steps.end(), findZoneStep);
 
-    if (st == chosenPath.steps.end()) {
+    if (st == _chosenPath.steps.end()) {
         return AttackEvent::Clearance;
     }
 
@@ -113,7 +148,7 @@ AttackEvent Tactic::GetAttackEvent(Zone ballZone) const {
 }
 
 Zone Tactic::GetNextZone(Zone ballZone) const {
-    if (chosenPath.steps.empty()) {
+    if (_chosenPath.steps.empty()) {
         return ballZone;
     }
 
@@ -121,19 +156,19 @@ Zone Tactic::GetNextZone(Zone ballZone) const {
         return step.from == ballZone;
         };
 
-    auto st = std::find_if(chosenPath.steps.begin(), chosenPath.steps.end(), findZoneStep);
+    auto st = std::find_if(_chosenPath.steps.begin(), _chosenPath.steps.end(), findZoneStep);
 
-    if (st == chosenPath.steps.end()) {
+    if (st == _chosenPath.steps.end()) {
         return ballZone;
     }
 
     return st->to;
 }
 
-DefenseTactic::DefenseTactic() : defenseTacticType{ DefenseTacticType::Pressing } {
+DefenseTactic::DefenseTactic() : _defenseTacticType{ DefenseTacticType::Pressing } {
 }
 
-DefenseTactic::DefenseTactic(DefenseTacticType type) : defenseTacticType{ type } {
+DefenseTactic::DefenseTactic(DefenseTacticType type) : _defenseTacticType{ type } {
     switch (type) {
     case DefenseTacticType::Pressing:
         *this = TacticFactory::CreatePressing();
@@ -153,22 +188,30 @@ DefenseTactic::DefenseTactic(DefenseTacticType type) : defenseTacticType{ type }
     }
 }
 
+DefenseTacticType DefenseTactic::getDefenseTacticType() const {
+    return _defenseTacticType;
+}
+
+void DefenseTactic::setDefenseTacticType(DefenseTacticType type) {
+    _defenseTacticType = type;
+}
+
 AttackEvent Tactic::StartAttack(Zone ballZone) {
     // TODO - More initialization will be done later
 
     // Whenever the ball is in possession of a team after either kickoff or a successful defensive action,
     // we will call this function to start the attack
-    if (newAttackPathChosen == false) {
-        chosenPath = GetRandomPath(ballZone);
-        newAttackPathChosen = true;
+    if (!_newAttackPathChosen) {
+        _chosenPath = GetRandomPath(ballZone);
+        _newAttackPathChosen = true;
     }
 
     return GetAttackEvent(ballZone);
 }
 
 void Tactic::ResetAttack() {
-    chosenPath = ZonePath{};
-    newAttackPathChosen = false;
+    _chosenPath = ZonePath{};
+    _newAttackPathChosen = false;
 }
 
 DefenseEvent DefenseTactic::RespondToAttack(AttackEvent attackEvent) {

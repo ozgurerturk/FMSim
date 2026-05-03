@@ -14,5 +14,4 @@ public:
     static DefenseTactic CreateManMarking();
     static DefenseTactic CreateZonalMarking();
     static DefenseTactic CreateCounterPressing();
-private:
 };

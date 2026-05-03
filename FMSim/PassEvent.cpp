@@ -6,39 +6,40 @@ PassEvent::PassEvent(PassType passType)
 
 double PassEvent::getEffortCoefficient() const {
     switch (passType) {
-    case PassType::ShortPass:
+        using enum PassType;
+    case ShortPass:
         return 0.20;
-    case PassType::LongPass:
+    case LongPass:
         return 0.25;
-    case PassType::ThroughBall:
+    case ThroughBall:
         return 0.25;
-    case PassType::Cross:
+    case Cross:
         return 0.30;
-    case PassType::OneTwoPass:
+    case OneTwoPass:
         return 0.35;
-    case PassType::SwitchOfPlay:
+    case SwitchOfPlay:
         return 0.30;
-    case PassType::CornerKick:
+    case CornerKick:
         return 0.10;
-    case PassType::CornerKickShort:
+    case CornerKickShort:
         return 0.10;
-    case PassType::BackPass:
+    case BackPass:
         return 0.15;
-    case PassType::CutBack:
+    case CutBack:
         return 0.25;
-    case PassType::ThrowIn:
+    case ThrowIn:
         return 0.05;
-    case PassType::ThrowInLong:
+    case ThrowInLong:
         return 0.10;
-    case PassType::GoalKick:
+    case GoalKick:
         return 0.10;
-    case PassType::GoalkeeperThrow:
+    case GoalkeeperThrow:
         return 0.15;
-    case PassType::FreeKickPass:
+    case FreeKickPass:
         return 0.10;
-    case PassType::FreeKickCross:
+    case FreeKickCross:
         return 0.15;
-    case PassType::Clearance:
+    case Clearance:
         return 0.25;
     default:
         return 0.20; // Default effort coefficient for unknown pass types
@@ -47,39 +48,40 @@ double PassEvent::getEffortCoefficient() const {
 
 std::string PassEvent::getName() const {
     switch (passType) {
-    case PassType::ShortPass:
+        using enum PassType;
+    case ShortPass:
         return "Short Pass";
-    case PassType::LongPass:
+    case LongPass:
         return "Long Pass";
-    case PassType::ThroughBall:
+    case ThroughBall:
         return "Through Ball";
-    case PassType::Cross:
+    case Cross:
         return "Cross";
-    case PassType::OneTwoPass:
+    case OneTwoPass:
         return "One-Two Pass";
-    case PassType::SwitchOfPlay:
+    case SwitchOfPlay:
         return "Switch of Play";
-    case PassType::CornerKick:
+    case CornerKick:
         return "Corner Kick";
-    case PassType::CornerKickShort:
+    case CornerKickShort:
         return "Corner Kick Short";
-    case PassType::BackPass:
+    case BackPass:
         return "Back Pass";
-    case PassType::CutBack:
+    case CutBack:
         return "Cut Back";
-    case PassType::ThrowIn:
+    case ThrowIn:
         return "Throw-In";
-    case PassType::ThrowInLong:
+    case ThrowInLong:
         return "Long Throw-In";
-    case PassType::GoalKick:
+    case GoalKick:
         return "Goal Kick";
-    case PassType::GoalkeeperThrow:
+    case GoalkeeperThrow:
         return "Goalkeeper Throw";
-    case PassType::FreeKickPass:
+    case FreeKickPass:
         return "Free Kick Pass";
-    case PassType::FreeKickCross:
+    case FreeKickCross:
         return "Free Kick Cross";
-    case PassType::Clearance:
+    case Clearance:
         return "Clearance";
     default:
         return "Unknown Pass Type";

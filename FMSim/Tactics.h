@@ -17,12 +17,14 @@ struct ZonePath {
 class Tactic {
 public:
     Tactic();
-    Tactic(TacticType type);
+    explicit Tactic(TacticType type);
 
-    TacticType tacticType;
-    std::vector<ZonePath> paths;
-    ZonePath chosenPath;
-
+    TacticType getTacticType() const;
+    void setTacticType(TacticType type);
+    void setPaths(std::vector<ZonePath> paths);
+    void addPath(const ZonePath& path);
+    bool hasPaths() const;
+    void addStepToLastPath(const ZoneStep& step);
     ZonePath GetRandomPath(Zone ballZone) const;
     AttackEvent GetAttackEvent(Zone ballZone) const;
     Zone GetNextZone(Zone ballZone) const;
@@ -31,15 +33,18 @@ public:
 
 private:
     TacticType _tacticType;
-    bool newAttackPathChosen = false;
+    std::vector<ZonePath> _paths;
+    ZonePath _chosenPath;
+    bool _newAttackPathChosen = false;
 };
 
 class DefenseTactic {
 public:
     DefenseTactic();
-    DefenseTactic(DefenseTacticType type);
+    explicit DefenseTactic(DefenseTacticType type);
 
-    DefenseTacticType defenseTacticType;
+    DefenseTacticType getDefenseTacticType() const;
+    void setDefenseTacticType(DefenseTacticType type);
     DefenseEvent RespondToAttack(AttackEvent attackEvent);
 
 private:

@@ -6,11 +6,12 @@ GoalKeeperEvent::GoalKeeperEvent(GoalKeeperEventType eventType)
 
 double GoalKeeperEvent::getEffortCoefficient() const {
     switch (eventType) {
-    case GoalKeeperEventType::GoalkeeperSave:
+        using enum GoalKeeperEventType;
+    case GoalkeeperSave:
         return 0.4;
-    case GoalKeeperEventType::GoalkeeperPunch:
+    case GoalkeeperPunch:
         return 0.3;
-    case GoalKeeperEventType::GoalkeeperCatch:
+    case GoalkeeperCatch:
         return 0.5;
     default:
         return 0.4; // Default effort coefficient for unknown goalkeeper events
@@ -19,11 +20,12 @@ double GoalKeeperEvent::getEffortCoefficient() const {
 
 std::string GoalKeeperEvent::getName() const {
     switch (eventType) {
-    case GoalKeeperEventType::GoalkeeperSave:
+        using enum GoalKeeperEventType;
+    case GoalkeeperSave:
         return "Goalkeeper Save";
-    case GoalKeeperEventType::GoalkeeperPunch:
+    case GoalkeeperPunch:
         return "Goalkeeper Punch";
-    case GoalKeeperEventType::GoalkeeperCatch:
+    case GoalkeeperCatch:
         return "Goalkeeper Catch";
     default:
         return "Goalkeeper Event";

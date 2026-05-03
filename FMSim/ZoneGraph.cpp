@@ -1,18 +1,19 @@
 #include "ZoneGraph.h"
 
 ZoneGraph::ZoneGraph() {
+    using enum Zone;
     adjacency = {
-        { Zone::H1, {Zone::H2, Zone::M1 } },
-        { Zone::H2, {Zone::H1, Zone::H3, Zone::M2 } },
-        { Zone::H3, {Zone::H2, Zone::M3 } },
+        { H1, {H2, M1 } },
+        { H2, {H1, H3, M2 } },
+        { H3, {H2, M3 } },
 
-        { Zone::M1, {Zone::H1, Zone::A1, Zone::M2 } },
-        { Zone::M2, {Zone::M1, Zone::M3, Zone::H2, Zone::A2}},
-        { Zone::M3, {Zone::H3, Zone::A3, Zone::M2 } },
+        { M1, {H1, A1, M2 } },
+        { M2, {M1, M3, H2, A2}},
+        { M3, {H3, A3, M2 } },
 
-        { Zone::A1, {Zone::A2, Zone::M1 } },
-        { Zone::A2, {Zone::A1, Zone::A3, Zone::M2 } },
-        { Zone::A3, {Zone::A2, Zone::M3 } },
+        { A1, {A2, M1 } },
+        { A2, {A1, A3, M2 } },
+        { A3, {A2, M3 } },
     };
 }
 
