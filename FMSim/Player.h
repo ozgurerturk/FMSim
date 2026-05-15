@@ -14,7 +14,7 @@ public:
 
     const std::string& getName() const;
     Position getPosition() const;
-    const Attributes getAttributes() const;
+    Attributes getAttributes() const;
     double getStamina() const;
     void useStamina(double effortCoefficient);
 

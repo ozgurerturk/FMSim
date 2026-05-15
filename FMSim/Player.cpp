@@ -28,7 +28,7 @@ Position Player::getPosition() const {
     return _position;
 }
 
-const Attributes Player::getAttributes() const {
+Attributes Player::getAttributes() const {
     return _attributes;
 }
 
@@ -42,7 +42,7 @@ void Player::useStamina(double effortCoefficient) {
 }
 
 double Player::calculateStaminaCost(double effortCoefficient) const {
-    double staminaAttr = static_cast<double>(getAttributes().getStamina()); // 0-100
+    auto staminaAttr = static_cast<double>(getAttributes().getStamina()); // 0-100
 
     double alpha = 0.5;
     double calibration = 1.0; // later

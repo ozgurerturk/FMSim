@@ -25,9 +25,9 @@ namespace FMSimTools.Views
             await ViewModel.StartAsync();
         }
 
-        private void MatchViewerForm_Closed(object? sender, EventArgs e)
+        private async void MatchViewerForm_Closed(object? sender, EventArgs e)
         {
-            ViewModel.Stop();
+            await ViewModel.StopAsync();
         }
     }
 }

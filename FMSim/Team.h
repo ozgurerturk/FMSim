@@ -39,7 +39,7 @@ public:
     DefenseTactic& getCurrentTeamDefenseTactic();
     const DefenseTactic& getCurrentTeamDefenseTactic() const;
 
-    const double* getTeamStamina();
+    const double* getTeamStamina() const;
 
 private:
     std::string _name;

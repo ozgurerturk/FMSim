@@ -170,16 +170,17 @@ DefenseTactic::DefenseTactic() : _defenseTacticType{ DefenseTacticType::Pressing
 
 DefenseTactic::DefenseTactic(DefenseTacticType type) : _defenseTacticType{ type } {
     switch (type) {
-    case DefenseTacticType::Pressing:
+        using enum DefenseTacticType;
+    case Pressing:
         *this = TacticFactory::CreatePressing();
         break;
-    case DefenseTacticType::ManMarking:
+    case ManMarking:
         *this = TacticFactory::CreateManMarking();
         break;
-    case DefenseTacticType::ZonalMarking:
+    case ZonalMarking:
         *this = TacticFactory::CreateZonalMarking();
         break;
-    case DefenseTacticType::CounterPressing:
+    case CounterPressing:
         *this = TacticFactory::CreateCounterPressing();
         break;
     default:

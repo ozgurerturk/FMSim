@@ -17,349 +17,354 @@ static ZonePath ConvertZonesToPath(const std::vector<Zone>& zones) {
 }
 
 Tactic TacticFactory::CreateWingPlay() {
+    using enum Zone;
     Tactic tactic;
     tactic.setTacticType(TacticType::WingPlay);
 
     tactic.setPaths(
-    {
-        // H2 -> M2 -> M1 -> A1 -> A2
-        ZonePath
         {
+            // H2 -> M2 -> M1 -> A1 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::M1 },
-                ZoneStep{ Zone::M1, Zone::A1 },
-                ZoneStep{ Zone::A1, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, M1 },
+                    ZoneStep{ M1, A1 },
+                    ZoneStep{ A1, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> M1 -> A1 -> A2 (A1 -> A2 long / cross)
-        ZonePath
-        {
+            // H2 -> M2 -> M1 -> A1 -> A2 (A1 -> A2 long / cross)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::M1 },
-                ZoneStep{ Zone::M1, Zone::A1 },
-                ZoneStep{ Zone::A1, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, M1 },
+                    ZoneStep{ M1, A1 },
+                    ZoneStep{ A1, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> M3 -> A3 -> A2
-        ZonePath
-        {
+            // H2 -> M2 -> M3 -> A3 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::M3 },
-                ZoneStep{ Zone::M3, Zone::A3 },
-                ZoneStep{ Zone::A3, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, M3 },
+                    ZoneStep{ M3, A3 },
+                    ZoneStep{ A3, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> M3 -> A3 -> A2 (A3 -> A2 long / cross)
-        ZonePath
-        {
+            // H2 -> M2 -> M3 -> A3 -> A2 (A3 -> A2 long / cross)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::M3 },
-                ZoneStep{ Zone::M3, Zone::A3 },
-                ZoneStep{ Zone::A3, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, M3 },
+                    ZoneStep{ M3, A3 },
+                    ZoneStep{ A3, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> H1 -> M1 -> A1 -> A2
-        ZonePath
-        {
+            // H2 -> H1 -> M1 -> A1 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::H1 },
-                ZoneStep{ Zone::H1, Zone::M1 },
-                ZoneStep{ Zone::M1, Zone::A1 },
-                ZoneStep{ Zone::A1, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, H1 },
+                    ZoneStep{ H1, M1 },
+                    ZoneStep{ M1, A1 },
+                    ZoneStep{ A1, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> H1 -> M1 -> A1 -> A2 (A1 -> A2 long / cross)
-        ZonePath
-        {
+            // H2 -> H1 -> M1 -> A1 -> A2 (A1 -> A2 long / cross)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::H1 },
-                ZoneStep{ Zone::H1, Zone::M1 },
-                ZoneStep{ Zone::M1, Zone::A1 },
-                ZoneStep{ Zone::A1, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, H1 },
+                    ZoneStep{ H1, M1 },
+                    ZoneStep{ M1, A1 },
+                    ZoneStep{ A1, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> H3 -> M3 -> A3 -> A2
-        ZonePath
-        {
+            // H2 -> H3 -> M3 -> A3 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::H3 },
-                ZoneStep{ Zone::H3, Zone::M3 },
-                ZoneStep{ Zone::M3, Zone::A3 },
-                ZoneStep{ Zone::A3, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, H3 },
+                    ZoneStep{ H3, M3 },
+                    ZoneStep{ M3, A3 },
+                    ZoneStep{ A3, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> H3 -> M3 -> A3 -> A2 (A3 -> A2 long / cross)
-        ZonePath
-        {
+            // H2 -> H3 -> M3 -> A3 -> A2 (A3 -> A2 long / cross)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::H3 },
-                ZoneStep{ Zone::H3, Zone::M3 },
-                ZoneStep{ Zone::M3, Zone::A3 },
-                ZoneStep{ Zone::A3, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, H3 },
+                    ZoneStep{ H3, M3 },
+                    ZoneStep{ M3, A3 },
+                    ZoneStep{ A3, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A1 -> A2   (M2 -> A1 long)
-        ZonePath
-        {
+            // H2 -> M2 -> A1 -> A2   (M2 -> A1 long)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A1, true },
-                ZoneStep{ Zone::A1, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A1, true },
+                    ZoneStep{ A1, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A1 -> A2   (M2 -> A1 long, A1 -> A2 long / cross)
-        ZonePath
-        {
+            // H2 -> M2 -> A1 -> A2   (M2 -> A1 long, A1 -> A2 long / cross)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A1, true },
-                ZoneStep{ Zone::A1, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A1, true },
+                    ZoneStep{ A1, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A3 -> A2   (M2 -> A3 long)
-        ZonePath
-        {
+            // H2 -> M2 -> A3 -> A2   (M2 -> A3 long)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A3, true },
-                ZoneStep{ Zone::A3, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A3, true },
+                    ZoneStep{ A3, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A3 -> A2   (M2 -> A3 long, A3 -> A2 long / cross)
-        ZonePath
-        {
+            // H2 -> M2 -> A3 -> A2   (M2 -> A3 long, A3 -> A2 long / cross)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A3, true },
-                ZoneStep{ Zone::A3, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A3, true },
+                    ZoneStep{ A3, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
             }
-        }
-    });
+        });
 
     return tactic;
 }
 
 Tactic TacticFactory::CreateLongBall() {
+    using enum Zone;
     Tactic tactic;
     tactic.setTacticType(TacticType::LongBall);
 
     tactic.setPaths(
-    {
-        // H2 -> A2(L)
-        ZonePath
         {
+            // H2 -> A2(L)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> A1(L) -> A2
-        ZonePath
-        {
+            // H2 -> A1(L) -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::A1, true },
-                ZoneStep{ Zone::A1, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
-        // H2 -> A1(L) -> A2(L)
-        ZonePath
-        {
+                {
+                    ZoneStep{ H2, A1, true },
+                    ZoneStep{ A1, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
+            // H2 -> A1(L) -> A2(L)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::A1, true },
-                ZoneStep{ Zone::A1, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
-        // H2 -> A3(L) -> A2
-        ZonePath
-        {
+                {
+                    ZoneStep{ H2, A1, true },
+                    ZoneStep{ A1, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
+            // H2 -> A3(L) -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::A3, true },
-                ZoneStep{ Zone::A3, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
-        // H2 -> A3(L) -> A2(L)
-        ZonePath
-        {
+                {
+                    ZoneStep{ H2, A3, true },
+                    ZoneStep{ A3, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
+            // H2 -> A3(L) -> A2(L)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::A3, true },
-                ZoneStep{ Zone::A3, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
+                {
+                    ZoneStep{ H2, A3, true },
+                    ZoneStep{ A3, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
             }
-        }
-    });
+        });
 
     return tactic;
 }
 
 Tactic TacticFactory::CreateTikiTaka() {
+    using enum Zone;
     Tactic tactic;
     tactic.setTacticType(TacticType::TikiTaka);
 
     tactic.setPaths(
-    {
-        // H2 -> M2 <=> A2
-        ZonePath
         {
+            // H2 -> M2 <=> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A2, false, true },
-                ZoneStep{ Zone::A2, Zone::M2, false, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A2, false, true },
+                    ZoneStep{ A2, M2, false, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A1 -> A2
-        ZonePath
-        {
+            // H2 -> M2 -> A1 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A1 },
-                ZoneStep{ Zone::A1, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A1 },
+                    ZoneStep{ A1, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A3 -> A2
-        ZonePath
-        {
+            // H2 -> M2 -> A3 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A3 },
-                ZoneStep{ Zone::A3, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A3 },
+                    ZoneStep{ A3, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> M1 -> A2
-        ZonePath
-        {
+            // H2 -> M2 -> M1 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::M1 },
-                ZoneStep{ Zone::M1, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, M1 },
+                    ZoneStep{ M1, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> M3 -> A2
-        ZonePath
-        {
+            // H2 -> M2 -> M3 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::M3 },
-                ZoneStep{ Zone::M3, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, M3 },
+                    ZoneStep{ M3, A2 },
+                    ZoneStep{ A2, A2 }
+                }
             }
-        }
-    });
+        });
 
     return tactic;
 }
 
 Tactic TacticFactory::CreateCounterAttack() {
+    using enum Zone;
     Tactic tactic;
     tactic.setTacticType(TacticType::CounterAttack);
 
     tactic.setPaths(
-    {
-        // H2 -> M2 -> A2
-        ZonePath
         {
+            // H2 -> M2 -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2(L) -> M1 -> A2(L)
-        ZonePath
-        {
+            // H2 -> M2(L) -> M1 -> A2(L)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2, true },
-                ZoneStep{ Zone::M2, Zone::M1 },
-                ZoneStep{ Zone::M1, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2, true },
+                    ZoneStep{ M2, M1 },
+                    ZoneStep{ M1, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2(L) -> M3 -> A2(L)
-        ZonePath
-        {
+            // H2 -> M2(L) -> M3 -> A2(L)
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2, true },
-                ZoneStep{ Zone::M2, Zone::M3 },
-                ZoneStep{ Zone::M3, Zone::A2, true },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2, true },
+                    ZoneStep{ M2, M3 },
+                    ZoneStep{ M3, A2, true },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A1(L) -> A2
-        ZonePath
-        {
+            // H2 -> M2 -> A1(L) -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A1, true },
-                ZoneStep{ Zone::A1, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
-            }
-        },
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A1, true },
+                    ZoneStep{ A1, A2 },
+                    ZoneStep{ A2, A2 }
+                }
+            },
 
-        // H2 -> M2 -> A3(L) -> A2
-        ZonePath
-        {
+            // H2 -> M2 -> A3(L) -> A2
+            ZonePath
             {
-                ZoneStep{ Zone::H2, Zone::M2 },
-                ZoneStep{ Zone::M2, Zone::A3, true },
-                ZoneStep{ Zone::A3, Zone::A2 },
-                ZoneStep{ Zone::A2, Zone::A2 }
+                {
+                    ZoneStep{ H2, M2 },
+                    ZoneStep{ M2, A3, true },
+                    ZoneStep{ A3, A2 },
+                    ZoneStep{ A2, A2 }
+                }
             }
-        }
-    });
+        });
 
     return tactic;
 }
 
 // Default tactic is Possession Game because it's the most basic and versatile tactic that can be used in various situations.
 Tactic TacticFactory::CreatePossessionGame() {
+    using enum Zone;
     Tactic tactic;
     tactic.setTacticType(TacticType::Possession);
 
     ZoneGraph graph;
 
-    Zone startZone = Zone::H2;
-    Zone targetZone = Zone::A2;
+    Zone startZone = H2;
+    Zone targetZone = A2;
 
     auto zoneSequence = PathFinder::FindPath(graph, startZone, targetZone);
     auto zonePath = ConvertZonesToPath(zoneSequence);
@@ -371,7 +376,7 @@ Tactic TacticFactory::CreatePossessionGame() {
     // Will now attempt to shoot or dribble in the A2 zone after reaching it, instead of just standing there without any action.
 
     if (tactic.hasPaths()) {
-        tactic.addStepToLastPath(ZoneStep{ Zone::A2, Zone::A2 });
+        tactic.addStepToLastPath(ZoneStep{ A2, A2 });
     }
 
     return tactic;

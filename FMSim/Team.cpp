@@ -138,6 +138,6 @@ const DefenseTactic& Team::getCurrentTeamDefenseTactic() const {
     return _defenseTacticObj;
 }
 
-const double* Team::getTeamStamina() {
+const double* Team::getTeamStamina() const {
     return nullptr;
 }

@@ -144,78 +144,98 @@ namespace FMSimTools.Services
             process.StartInfo.Environment["FMSIM_SKIP_REPLAY"] = "1";
             process.StartInfo.Environment["FMSIM_LIVE_EVENTS"] = "1";
 
-            process.Start();
-
-            await process.StandardInput.WriteLineAsync(request.SimulationMinutes.ToString());
-            await process.StandardInput.WriteLineAsync(request.SimulationCount.ToString());
-
-            var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
-            var outputLines = new List<string>();
-
-            while (!process.StandardOutput.EndOfStream)
+            var processStarted = false;
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                process.Start();
+                processStarted = true;
 
-                var line = await process.StandardOutput.ReadLineAsync(cancellationToken);
-                if (line is null)
+                await process.StandardInput.WriteLineAsync(request.SimulationMinutes.ToString());
+                await process.StandardInput.WriteLineAsync(request.SimulationCount.ToString());
+
+                var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+                var outputLines = new List<string>();
+
+                while (!process.StandardOutput.EndOfStream)
                 {
-                    break;
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    var line = await process.StandardOutput.ReadLineAsync(cancellationToken);
+                    if (line is null)
+                    {
+                        break;
+                    }
+
+                    outputLines.Add(line);
+
+                    const string livePrefix = "FMSIM_EVENT ";
+                    var livePrefixIndex = line.IndexOf(livePrefix, StringComparison.Ordinal);
+                    if (livePrefixIndex < 0)
+                    {
+                        continue;
+                    }
+
+                    var liveEvent = JsonSerializer.Deserialize<LiveMatchEvent>(
+                        line[(livePrefixIndex + livePrefix.Length)..],
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    if (liveEvent is null)
+                    {
+                        continue;
+                    }
+
+                    await onEvent(liveEvent);
+
+                    if (liveEvent.IsFullTime)
+                    {
+                        continue;
+                    }
+
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+                    await process.StandardInput.WriteLineAsync("next");
                 }
 
-                outputLines.Add(line);
+                await process.WaitForExitAsync(cancellationToken);
+                var errorText = await errorTask;
+                var outputText = string.Join(Environment.NewLine, outputLines);
 
-                const string livePrefix = "FMSIM_EVENT ";
-                var livePrefixIndex = line.IndexOf(livePrefix, StringComparison.Ordinal);
-                if (livePrefixIndex < 0)
+                if (process.ExitCode != 0)
                 {
-                    continue;
+                    var details = string.IsNullOrWhiteSpace(errorText) ? outputText : errorText;
+                    await File.WriteAllTextAsync(
+                        Path.Combine(logsDirectory, "simulation_error.txt"),
+                        details,
+                        cancellationToken);
+                    throw new InvalidOperationException($"Simulation failed with exit code {process.ExitCode}: {details}");
                 }
 
-                var liveEvent = JsonSerializer.Deserialize<LiveMatchEvent>(
-                    line[(livePrefixIndex + livePrefix.Length)..],
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (liveEvent is null)
+                var commentaryPath = FindLatestLogFile(logsDirectory, $"match_commentary_{request.SimulationMinutes}*.txt", startedAt);
+                var eventLogPath = FindLatestLogFile(logsDirectory, $"eventlog_{request.SimulationMinutes}*.txt", startedAt);
+
+                return new SimulationResult
                 {
-                    continue;
-                }
-
-                await onEvent(liveEvent);
-
-                if (liveEvent.IsFullTime)
-                {
-                    continue;
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
-                await process.StandardInput.WriteLineAsync("next");
+                    CommentaryPath = commentaryPath,
+                    CommentaryText = string.IsNullOrWhiteSpace(commentaryPath) ? string.Empty : await File.ReadAllTextAsync(commentaryPath, cancellationToken),
+                    EventLogPath = eventLogPath,
+                    EventLogText = string.IsNullOrWhiteSpace(eventLogPath) ? string.Empty : await File.ReadAllTextAsync(eventLogPath, cancellationToken),
+                    OutputText = outputText,
+                    ErrorText = errorText
+                };
             }
-
-            await process.WaitForExitAsync(cancellationToken);
-            var errorText = await errorTask;
-            var outputText = string.Join(Environment.NewLine, outputLines);
-
-            if (process.ExitCode != 0)
+            finally
             {
-                var details = string.IsNullOrWhiteSpace(errorText) ? outputText : errorText;
-                await File.WriteAllTextAsync(
-                    Path.Combine(logsDirectory, "simulation_error.txt"),
-                    details,
-                    cancellationToken);
-                throw new InvalidOperationException($"Simulation failed with exit code {process.ExitCode}: {details}");
+                try
+                {
+                    if (processStarted && !process.HasExited)
+                    {
+                        process.Kill(entireProcessTree: true);
+                        await process.WaitForExitAsync(CancellationToken.None);
+                    }
+                }
+                catch (InvalidOperationException)
+                {
+                    // Process has already exited.
+                }
             }
-
-            var commentaryPath = FindLatestLogFile(logsDirectory, $"match_commentary_{request.SimulationMinutes}*.txt", startedAt);
-            var eventLogPath = FindLatestLogFile(logsDirectory, $"eventlog_{request.SimulationMinutes}*.txt", startedAt);
-
-            return new SimulationResult
-            {
-                CommentaryPath = commentaryPath,
-                CommentaryText = string.IsNullOrWhiteSpace(commentaryPath) ? string.Empty : await File.ReadAllTextAsync(commentaryPath, cancellationToken),
-                EventLogPath = eventLogPath,
-                EventLogText = string.IsNullOrWhiteSpace(eventLogPath) ? string.Empty : await File.ReadAllTextAsync(eventLogPath, cancellationToken),
-                OutputText = outputText,
-                ErrorText = errorText
-            };
         }
 
         private static string FindLatestLogFile(string logsDirectory, string searchPattern, DateTime startedAt)
@@ -227,12 +247,9 @@ namespace FMSimTools.Services
                 .OrderByDescending(file => file.LastWriteTime)
                 .FirstOrDefault()?.FullName;
 
-            if (path is not null)
-            {
-                return path;
-            }
-
-            return Directory
+            return path is not null
+                ? path
+                : Directory
                 .EnumerateFiles(logsDirectory, searchPattern.Replace("*", "*"))
                 .Select(path => new FileInfo(path))
                 .OrderByDescending(file => file.LastWriteTime)
